@@ -135,6 +135,10 @@
     font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
     color: var(--text-secondary);
     font-size: 0.8125rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
   }
   .masthead__clock {
     font-size: 1.1rem;
@@ -142,6 +146,27 @@
     font-variant-numeric: tabular-nums;
   }
   .masthead__meta .dim { color: var(--text-muted); }
+
+  .lang-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .lang-btn {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: var(--surface);
+    color: var(--text-secondary);
+    border: none;
+    padding: 5px 11px;
+    cursor: pointer;
+  }
+  .lang-btn + .lang-btn { border-left: 1px solid var(--border-strong); }
+  .lang-btn[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+  .lang-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
   /* ---------- Section labels ---------- */
   .section-label {
@@ -198,7 +223,7 @@
     margin-top: 6px;
     font-size: 0.8125rem;
     color: var(--text-secondary);
-    max-width: 24ch;
+    max-width: 26ch;
   }
   .sources-line {
     margin-top: 10px;
@@ -470,48 +495,54 @@
 
   <header class="masthead">
     <div>
-      <p class="masthead__eyebrow">Operational Intelligence — Demonstration Build</p>
+      <p class="masthead__eyebrow" data-i18n="eyebrow"></p>
       <h1 class="masthead__title">VIGIA</h1>
-      <p class="masthead__sub">Live visibility into fuel-network stock levels and stockout risk — built to show what a distributor partnership could power across Angola's retail network.</p>
+      <p class="masthead__sub" data-i18n="subtitle"></p>
     </div>
     <div class="masthead__meta">
-      <div class="masthead__clock mono" id="clock">--:--:--</div>
-      <div id="clockDate" class="dim">Luanda</div>
+      <div class="lang-toggle" role="group" aria-label="Language / Idioma">
+        <button type="button" class="lang-btn" id="langPt" data-lang="pt">PT</button>
+        <button type="button" class="lang-btn" id="langEn" data-lang="en">EN</button>
+      </div>
+      <div>
+        <div class="masthead__clock mono" id="clock">--:--:--</div>
+        <div id="clockDate" class="dim">Luanda</div>
+      </div>
     </div>
   </header>
 
   <section class="block">
     <div class="section-label">
       <span class="section-label__num">01</span>
-      <h2>Angola's downstream fuel market</h2>
-      <span class="section-label__note">Sourced · Public data</span>
+      <h2 data-i18n="section1Title"></h2>
+      <span class="section-label__note" data-i18n="section1Note"></span>
     </div>
     <div class="kpi-strip">
       <div class="kpi-tile">
         <div class="kpi-tile__value">#2</div>
-        <div class="kpi-tile__label">Crude producer in Africa — yet a net importer of refined fuel, due to limited domestic refining capacity¹</div>
+        <div class="kpi-tile__label" data-i18n="kpi1Label"></div>
       </div>
       <div class="kpi-tile">
         <div class="kpi-tile__value">56%</div>
-        <div class="kpi-tile__label">Of retail stations sit inside just four distributor networks²</div>
+        <div class="kpi-tile__label" data-i18n="kpi2Label"></div>
       </div>
       <div class="kpi-tile">
         <div class="kpi-tile__value">44%</div>
-        <div class="kpi-tile__label">Of stations are independent "Bandeira Branca" operators, outside any single distributor²</div>
+        <div class="kpi-tile__label" data-i18n="kpi3Label"></div>
       </div>
       <div class="kpi-tile">
         <div class="kpi-tile__value">+31%</div>
-        <div class="kpi-tile__label">Projected growth in Angola's LPG demand by 2027³</div>
+        <div class="kpi-tile__label" data-i18n="kpi4Label"></div>
       </div>
     </div>
-    <div class="sources-line">¹ Angola Petroleum — Downstream Overview &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail &nbsp;·&nbsp; ³ Energy Capital &amp; Power, Angola downstream investment coverage</div>
+    <div class="sources-line" id="sourcesLine"></div>
   </section>
 
   <section class="block">
     <div class="section-label">
       <span class="section-label__num">02</span>
-      <h2>Retail network by distributor</h2>
-      <span class="section-label__note">526 stations</span>
+      <h2 data-i18n="section2Title"></h2>
+      <span class="section-label__note" data-i18n="section2Note"></span>
     </div>
     <div class="market-panel">
       <div class="donut-wrap">
@@ -524,22 +555,22 @@
   <section class="block">
     <div class="section-label">
       <span class="section-label__num">03</span>
-      <h2>Live network simulation</h2>
-      <span class="section-label__note">Updating</span>
+      <h2 data-i18n="section3Title"></h2>
+      <span class="section-label__note" data-i18n="section3Note"></span>
     </div>
 
     <div class="sim-banner">
-      <span class="sim-banner__badge">SIMULATED</span>
-      <p><strong>Station-level tank data below is synthetic</strong>, generated to demonstrate the analytics engine — capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 above are real, sourced figures. Connected to actual tank telemetry, this becomes a live operational feed — see section 05.</p>
+      <span class="sim-banner__badge" data-i18n="simBadge"></span>
+      <p id="simText"></p>
     </div>
 
     <div class="filter-bar">
       <div class="filter-field">
-        <label for="provinceSelect">Province</label>
+        <label for="provinceSelect" data-i18n="filterProvinceLabel"></label>
         <select id="provinceSelect"></select>
       </div>
       <div class="filter-field">
-        <label for="municipioSelect">Município</label>
+        <label for="municipioSelect" data-i18n="filterMunicipioLabel"></label>
         <select id="municipioSelect"></select>
       </div>
       <span class="filter-count" id="filterCount"></span>
@@ -551,19 +582,19 @@
   <section class="block">
     <div class="section-label">
       <span class="section-label__num">04</span>
-      <h2>Priority resupply queue</h2>
-      <span class="section-label__note">Within current selection</span>
+      <h2 data-i18n="section4Title"></h2>
+      <span class="section-label__note" data-i18n="section4Note"></span>
     </div>
     <div class="table-wrap">
       <table class="priority">
         <thead>
           <tr>
-            <th>Rank</th>
-            <th>Station</th>
-            <th>Município</th>
-            <th>Time to empty</th>
-            <th>Stockout risk (24h)</th>
-            <th>Action</th>
+            <th data-i18n="thRank"></th>
+            <th data-i18n="thStation"></th>
+            <th data-i18n="thMunicipio"></th>
+            <th data-i18n="thEta"></th>
+            <th data-i18n="thRisk"></th>
+            <th data-i18n="thAction"></th>
           </tr>
         </thead>
         <tbody id="priorityBody"></tbody>
@@ -574,22 +605,22 @@
   <section class="block pitch-panel">
     <div class="section-label" style="margin-bottom:14px;">
       <span class="section-label__num">05</span>
-      <h2>What this becomes with real telemetry</h2>
+      <h2 data-i18n="section5Title"></h2>
     </div>
-    <p>This build runs entirely on public national statistics and a synthetic station simulation — no distributor data was used or requested to produce it. It exists to show the engine, not to claim access it doesn't have.</p>
-    <p>Connected to real inputs, the same architecture becomes an operational tool rather than a demonstration:</p>
+    <p id="pitchP1"></p>
+    <p id="pitchP2"></p>
     <ul>
-      <li><strong>Tank-level feed</strong> — from existing automated gauges where installed, or low-cost ultrasonic/float retrofits where they aren't.</li>
-      <li><strong>Predictive stockout modeling</strong> — trained on real draw-down and delivery history instead of a synthetic rate.</li>
-      <li><strong>Delivery prioritization</strong> — a live, ranked dispatch queue instead of the illustrative one in section 04.</li>
-      <li><strong>Consumer-facing visibility</strong> — the same data, surfaced to drivers, reduces the "station-hopping" congestion that costs every station foot traffic and fuel.</li>
+      <li id="pitchLi1"></li>
+      <li id="pitchLi2"></li>
+      <li id="pitchLi3"></li>
+      <li id="pitchLi4"></li>
     </ul>
   </section>
 
   <footer class="signoff">
     <div>
       <div class="signoff__name">Aires Augusto Miguêns</div>
-      <div class="signoff__cred">Data Scientist · MSc Data Science, Worcester Polytechnic Institute (exp. 2026) · Fulbright Scholar 2024–2026 · IEEE HealthCom 2026 (peer-reviewed) · Harvard Health System Innovation Lab, Research Collaborator</div>
+      <div class="signoff__cred" id="signoffCred"></div>
     </div>
     <div class="signoff__contact">
       <div><a href="mailto:airesmiguens@gmail.com">airesmiguens@gmail.com</a></div>
@@ -599,7 +630,7 @@
     </div>
   </footer>
 
-  <p class="disclaimer">Vigia is an independent proof-of-capability prototype prepared by Aires Miguêns and is not affiliated with, endorsed by, or built using data from Sonangol, Pumangol, Galp/Sonangalp or TotalEnergies. Market-share figures in section 02 are drawn from published third-party reporting (S&amp;P Global, Angola Petroleum); station-level data in sections 03–04 is synthetic and illustrative only.</p>
+  <p class="disclaimer" id="disclaimer"></p>
 
 </div>
 
@@ -619,13 +650,128 @@
   }
   var rng = mulberry32(19790821);
 
+  // ---------- i18n ----------
+  var i18n = {
+    pt: {
+      eyebrow: "Inteligência Operacional — Versão de Demonstração",
+      subtitle: "Visibilidade em tempo real sobre os níveis de stock e o risco de rutura na rede de combustíveis — construído para mostrar o que uma parceria com um distribuidor poderia potenciar em toda a rede retalhista de Angola.",
+      section1Title: "O mercado de combustíveis a jusante de Angola",
+      section1Note: "Fontes · Dados públicos",
+      kpi1Label: "Maior produtor de petróleo bruto de África — mas importador líquido de combustível refinado, devido à capacidade limitada de refinação nacional¹",
+      kpi2Label: "Dos postos de venda pertencem a apenas quatro redes de distribuidores²",
+      kpi3Label: 'Dos postos são operadores independentes "Bandeira Branca", fora de qualquer distribuidor²',
+      kpi4Label: "Crescimento previsto da procura de GPL em Angola até 2027³",
+      sourcesLine: "¹ Angola Petroleum — Visão Geral do Downstream &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail &nbsp;·&nbsp; ³ Energy Capital &amp; Power, cobertura de investimento downstream em Angola",
+      section2Title: "Rede de retalho por distribuidor",
+      section2Note: "526 postos",
+      donutStations: "postos",
+      section3Title: "Simulação da rede em tempo real",
+      section3Note: "A atualizar",
+      simBadge: "SIMULADO",
+      simText: '<strong>Os dados ao nível dos postos abaixo são sintéticos</strong>, gerados para demonstrar o motor analítico — capacidades, taxas de consumo e previsão de rutura são modelados, não medidos. As secções 01–02 acima são dados reais, com fontes. Ligado a telemetria real dos tanques, isto torna-se um fluxo operacional ao vivo — ver secção 05.',
+      filterProvinceLabel: "Província",
+      filterMunicipioLabel: "Município",
+      filterAllProvinces: "Todas as províncias",
+      filterAllMunicipios: "Todos os municípios",
+      filterCount: function (n, total) { return n + " de " + total + " postos"; },
+      statVolume: "Volume estimado",
+      statDrawdown: "Consumo",
+      statEta: "Tempo até esgotar",
+      statRisk: "Risco de rutura (24h)",
+      statusReady: "PRONTO",
+      statusLow: "BAIXO",
+      statusCritical: "CRÍTICO",
+      section4Title: "Fila de reabastecimento prioritário",
+      section4Note: "Dentro da seleção atual",
+      thRank: "Posição",
+      thStation: "Posto",
+      thMunicipio: "Município",
+      thEta: "Tempo até esgotar",
+      thRisk: "Risco de rutura (24h)",
+      thAction: "Ação",
+      actionDispatch: "DESPACHAR AGORA",
+      actionSchedule: "AGENDAR",
+      actionMonitor: "MONITORIZAR",
+      noResults: "Nenhum posto nesta seleção.",
+      etaPlus: "96h+",
+      etaPrefix: "~",
+      section5Title: "O que isto se torna com telemetria real",
+      pitchP1: "Esta versão funciona inteiramente com estatísticas públicas nacionais e uma simulação sintética de postos — não foram usados nem solicitados dados de qualquer distribuidor para a produzir. Existe para mostrar o motor, não para reivindicar um acesso que não tem.",
+      pitchP2: "Ligado a dados reais, a mesma arquitetura torna-se uma ferramenta operacional em vez de uma demonstração:",
+      pitchLi1: "<strong>Fluxo de nível de tanque</strong> — a partir de sensores automáticos já existentes, ou de retrofits de baixo custo (ultrassónicos/boia) onde não existem.",
+      pitchLi2: "<strong>Modelação preditiva de rutura</strong> — treinada com histórico real de consumo e entregas, em vez de uma taxa sintética.",
+      pitchLi3: "<strong>Priorização de entregas</strong> — uma fila de despacho real e classificada, em vez da ilustrativa na secção 04.",
+      pitchLi4: '<strong>Visibilidade para o condutor</strong> — os mesmos dados, mostrados aos condutores, reduzem a "procura de posto em posto" que custa tráfego e combustível a cada estação.',
+      signoffCred: "Cientista de Dados · Mestrado em Ciência de Dados, Worcester Polytechnic Institute (prev. 2026) · Bolseiro Fulbright 2024–2026 · IEEE HealthCom 2026 (revisto por pares) · Harvard Health System Innovation Lab, Colaborador de Investigação",
+      disclaimer: 'O Vigia é um protótipo independente de prova de capacidade, preparado por Aires Miguêns, sem afiliação ou aprovação da Sonangol, Pumangol, Galp/Sonangalp ou TotalEnergies, e não construído com dados destas empresas. Os valores de quota de mercado na secção 02 provêm de fontes públicas de terceiros (S&amp;P Global, Angola Petroleum); os dados ao nível dos postos nas secções 03–04 são sintéticos e apenas ilustrativos.',
+      marketNames: ["Bandeira Branca (independente)", "Sonangol Distribuidora", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
+    },
+    en: {
+      eyebrow: "Operational Intelligence — Demonstration Build",
+      subtitle: "Live visibility into fuel-network stock levels and stockout risk — built to show what a distributor partnership could power across Angola's retail network.",
+      section1Title: "Angola's downstream fuel market",
+      section1Note: "Sourced · Public data",
+      kpi1Label: "Crude producer in Africa — yet a net importer of refined fuel, due to limited domestic refining capacity¹",
+      kpi2Label: "Of retail stations sit inside just four distributor networks²",
+      kpi3Label: 'Of stations are independent "Bandeira Branca" operators, outside any single distributor²',
+      kpi4Label: "Projected growth in Angola's LPG demand by 2027³",
+      sourcesLine: "¹ Angola Petroleum — Downstream Overview &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail &nbsp;·&nbsp; ³ Energy Capital &amp; Power, Angola downstream investment coverage",
+      section2Title: "Retail network by distributor",
+      section2Note: "526 stations",
+      donutStations: "stations",
+      section3Title: "Live network simulation",
+      section3Note: "Updating",
+      simBadge: "SIMULATED",
+      simText: '<strong>Station-level tank data below is synthetic</strong>, generated to demonstrate the analytics engine — capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 above are real, sourced figures. Connected to actual tank telemetry, this becomes a live operational feed — see section 05.',
+      filterProvinceLabel: "Province",
+      filterMunicipioLabel: "Municipality",
+      filterAllProvinces: "All provinces",
+      filterAllMunicipios: "All municipalities",
+      filterCount: function (n, total) { return n + " of " + total + " stations"; },
+      statVolume: "Est. volume",
+      statDrawdown: "Draw-down",
+      statEta: "Time to empty",
+      statRisk: "Stockout risk (24h)",
+      statusReady: "READY",
+      statusLow: "LOW",
+      statusCritical: "CRITICAL",
+      section4Title: "Priority resupply queue",
+      section4Note: "Within current selection",
+      thRank: "Rank",
+      thStation: "Station",
+      thMunicipio: "Municipality",
+      thEta: "Time to empty",
+      thRisk: "Stockout risk (24h)",
+      thAction: "Action",
+      actionDispatch: "DISPATCH NOW",
+      actionSchedule: "SCHEDULE",
+      actionMonitor: "MONITOR",
+      noResults: "No stations in this selection.",
+      etaPlus: "96h+",
+      etaPrefix: "~",
+      section5Title: "What this becomes with real telemetry",
+      pitchP1: "This build runs entirely on public national statistics and a synthetic station simulation — no distributor data was used or requested to produce it. It exists to show the engine, not to claim access it doesn't have.",
+      pitchP2: "Connected to real inputs, the same architecture becomes an operational tool rather than a demonstration:",
+      pitchLi1: "<strong>Tank-level feed</strong> — from existing automated gauges where installed, or low-cost ultrasonic/float retrofits where they aren't.",
+      pitchLi2: "<strong>Predictive stockout modeling</strong> — trained on real draw-down and delivery history instead of a synthetic rate.",
+      pitchLi3: "<strong>Delivery prioritization</strong> — a live, ranked dispatch queue instead of the illustrative one in section 04.",
+      pitchLi4: '<strong>Consumer-facing visibility</strong> — the same data, surfaced to drivers, reduces the "station-hopping" congestion that costs every station foot traffic and fuel.',
+      signoffCred: "Data Scientist · MSc Data Science, Worcester Polytechnic Institute (exp. 2026) · Fulbright Scholar 2024–2026 · IEEE HealthCom 2026 (peer-reviewed) · Harvard Health System Innovation Lab, Research Collaborator",
+      disclaimer: 'Vigia is an independent proof-of-capability prototype prepared by Aires Miguêns and is not affiliated with, endorsed by, or built using data from Sonangol, Pumangol, Galp/Sonangalp or TotalEnergies. Market-share figures in section 02 are drawn from published third-party reporting (S&amp;P Global, Angola Petroleum); station-level data in sections 03–04 is synthetic and illustrative only.',
+      marketNames: ["Bandeira Branca (independent)", "Sonangol Distribuidora", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
+    }
+  };
+  var currentLang = "pt";
+  function t(key) { return i18n[currentLang][key]; }
+
   // ---------- clock ----------
   var clockEl = document.getElementById("clock");
   var clockDateEl = document.getElementById("clockDate");
   function tickClock() {
     var now = new Date();
-    var timeFmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Africa/Luanda", hour12: false });
-    var dateFmt = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Africa/Luanda" });
+    var locale = currentLang === "pt" ? "pt-PT" : "en-GB";
+    var timeFmt = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Africa/Luanda", hour12: false });
+    var dateFmt = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric", timeZone: "Africa/Luanda" });
     clockEl.textContent = timeFmt.format(now);
     clockDateEl.textContent = "Luanda · " + dateFmt.format(now);
   }
@@ -633,21 +779,25 @@
   setInterval(tickClock, 1000);
 
   // ---------- market share (real, sourced) ----------
-  var market = [
-    { name: "Bandeira Branca (independent)", share: 44, stations: 393, color: "var(--cat-1)" },
-    { name: "Sonangol Distribuidora", share: 36, stations: 326, color: "var(--cat-2)" },
-    { name: "Pumangol", share: 9, stations: 78, color: "var(--cat-3)" },
-    { name: "Sonangalp (Galp)", share: 7, stations: 60, color: "var(--cat-4)" },
-    { name: "Tomsa (TotalEnergies)", share: 4, stations: 41, color: "var(--cat-5)" }
+  var marketBase = [
+    { share: 44, stations: 393, color: "var(--cat-1)" },
+    { share: 36, stations: 326, color: "var(--cat-2)" },
+    { share: 9, stations: 78, color: "var(--cat-3)" },
+    { share: 7, stations: 60, color: "var(--cat-4)" },
+    { share: 4, stations: 41, color: "var(--cat-5)" }
   ];
 
-  (function renderDonut() {
-    var svg = document.getElementById("donut");
+  var donutSvg = document.getElementById("donut");
+  var legendTableEl = document.getElementById("legendTable");
+  var ns = "http://www.w3.org/2000/svg";
+
+  function renderDonut() {
+    donutSvg.innerHTML = "";
     var cx = 90, cy = 90, r = 68, sw = 24;
     var circumference = 2 * Math.PI * r;
     var offset = 0;
-    var ns = "http://www.w3.org/2000/svg";
-    market.forEach(function (m) {
+    var names = t("marketNames");
+    marketBase.forEach(function (m, idx) {
       var len = (m.share / 100) * circumference;
       var gap = 2;
       var circle = document.createElementNS(ns, "circle");
@@ -661,9 +811,9 @@
       circle.setAttribute("stroke-dashoffset", -offset);
       circle.setAttribute("transform", "rotate(-90 " + cx + " " + cy + ")");
       var title = document.createElementNS(ns, "title");
-      title.textContent = m.name + " — " + m.share + "% (" + m.stations + " stations)";
+      title.textContent = names[idx] + " — " + m.share + "% (" + m.stations + (currentLang === "pt" ? " postos)" : " stations)");
       circle.appendChild(title);
-      svg.appendChild(circle);
+      donutSvg.appendChild(circle);
       offset += len;
     });
     var centerText = document.createElementNS(ns, "text");
@@ -675,7 +825,7 @@
     centerText.setAttribute("font-weight", "600");
     centerText.setAttribute("fill", "currentColor");
     centerText.textContent = "526";
-    svg.appendChild(centerText);
+    donutSvg.appendChild(centerText);
     var centerSub = document.createElementNS(ns, "text");
     centerSub.setAttribute("x", cx);
     centerSub.setAttribute("y", cy + 14);
@@ -683,21 +833,22 @@
     centerSub.setAttribute("font-size", "10");
     centerSub.setAttribute("fill", "currentColor");
     centerSub.setAttribute("opacity", "0.55");
-    centerSub.textContent = "stations";
-    svg.appendChild(centerSub);
-  })();
+    centerSub.textContent = t("donutStations");
+    donutSvg.appendChild(centerSub);
+  }
 
-  (function renderLegend() {
-    var table = document.getElementById("legendTable");
-    market.forEach(function (m) {
+  function renderLegend() {
+    legendTableEl.innerHTML = "";
+    var names = t("marketNames");
+    marketBase.forEach(function (m, idx) {
       var tr = document.createElement("tr");
       tr.innerHTML =
-        '<td><span class="legend-swatch" style="background:' + m.color + '"></span><span class="legend-name">' + m.name + '</span></td>' +
+        '<td><span class="legend-swatch" style="background:' + m.color + '"></span><span class="legend-name">' + names[idx] + '</span></td>' +
         '<td class="legend-share">' + m.share + '%</td>' +
-        '<td class="legend-stations">' + m.stations + ' stations</td>';
-      table.appendChild(tr);
+        '<td class="legend-stations">' + m.stations + ' ' + t("donutStations") + '</td>';
+      legendTableEl.appendChild(tr);
     });
-  })();
+  }
 
   // ---------- simulated station network (real provinces/municípios) ----------
   var geography = {
@@ -724,7 +875,6 @@
       });
     });
   });
-  // force a spread of dramatic states across different provinces so the demo reads immediately in any filter
   function forceState(district, pctOfCap, rate) {
     var s = stations.find(function (x) { return x.district === district; });
     if (s) { s.level = s.capacity * pctOfCap; if (rate) s.rate = rate; }
@@ -745,22 +895,26 @@
   var filterCountEl = document.getElementById("filterCount");
 
   function populateProvinces() {
-    var opts = ['<option value="all">All provinces</option>'];
+    var current = provinceSelect.value || "all";
+    var opts = ['<option value="all">' + t("filterAllProvinces") + '</option>'];
     Object.keys(geography).forEach(function (p) {
       opts.push('<option value="' + p + '">' + p + '</option>');
     });
     provinceSelect.innerHTML = opts.join("");
+    provinceSelect.value = current;
+    if (provinceSelect.selectedIndex < 0) provinceSelect.value = "all";
   }
   function populateMunicipios(province) {
-    var opts = ['<option value="all">All municípios</option>'];
+    var current = municipioSelect.value || "all";
+    var opts = ['<option value="all">' + t("filterAllMunicipios") + '</option>'];
     var list = province === "all"
       ? Object.keys(geography).reduce(function (acc, p) { return acc.concat(geography[p]); }, [])
       : geography[province] || [];
     list.forEach(function (m) { opts.push('<option value="' + m + '">' + m + '</option>'); });
     municipioSelect.innerHTML = opts.join("");
+    municipioSelect.value = current;
+    if (municipioSelect.selectedIndex < 0) municipioSelect.value = "all";
   }
-  populateProvinces();
-  populateMunicipios("all");
 
   function currentFilter() {
     return { province: provinceSelect.value, municipio: municipioSelect.value };
@@ -774,15 +928,18 @@
   }
 
   function statusFor(pct) {
-    if (pct <= 0.15) return { key: "critical", label: "CRITICAL" };
-    if (pct <= 0.4) return { key: "warning", label: "LOW" };
-    return { key: "good", label: "READY" };
+    if (pct <= 0.15) return { key: "critical", label: t("statusCritical") };
+    if (pct <= 0.4) return { key: "warning", label: t("statusLow") };
+    return { key: "good", label: t("statusReady") };
   }
   function hoursToEmpty(s) {
     return s.rate > 0 ? s.level / s.rate : 999;
   }
   function riskPct(hrs) {
     return Math.max(3, Math.min(97, Math.round(100 - (hrs / 30) * 100)));
+  }
+  function fmtEta(hrs) {
+    return hrs > 96 ? t("etaPlus") : t("etaPrefix") + Math.round(hrs) + "h";
   }
 
   function buildCard(s) {
@@ -809,10 +966,10 @@
         '<div class="tank__value mono" id="val-' + i + '">0%</div>' +
       '</div>' +
       '<dl class="station-stats">' +
-        '<div><dt>Est. volume</dt><dd id="vol-' + i + '"></dd></div>' +
-        '<div><dt>Draw-down</dt><dd>' + s.rate.toLocaleString() + ' L/h</dd></div>' +
-        '<div><dt>Time to empty</dt><dd id="eta-' + i + '"></dd></div>' +
-        '<div><dt>Stockout risk (24h)</dt><dd id="risk-' + i + '"></dd></div>' +
+        '<div><dt>' + t("statVolume") + '</dt><dd id="vol-' + i + '"></dd></div>' +
+        '<div><dt>' + t("statDrawdown") + '</dt><dd>' + s.rate.toLocaleString() + ' L/h</dd></div>' +
+        '<div><dt>' + t("statEta") + '</dt><dd id="eta-' + i + '"></dd></div>' +
+        '<div><dt>' + t("statRisk") + '</dt><dd id="risk-' + i + '"></dd></div>' +
       '</dl>';
     card.appendChild(body);
     return card;
@@ -824,17 +981,16 @@
     if (!visible.length) {
       var empty = document.createElement("div");
       empty.className = "no-results";
-      empty.textContent = "No stations in this selection.";
+      empty.textContent = t("noResults");
       gridEl.appendChild(empty);
     } else {
       visible.forEach(function (s) { gridEl.appendChild(buildCard(s)); });
     }
-    filterCountEl.textContent = visible.length + " of " + stations.length + " stations";
+    filterCountEl.textContent = t("filterCount")(visible.length, stations.length);
     updateValues();
   }
 
   function updateValues() {
-    var circumference = 0; // unused, kept for clarity of intent removal
     stations.forEach(function (s, i) {
       var fillEl = document.getElementById("fill-" + i);
       if (!fillEl) return; // not currently rendered (filtered out)
@@ -852,7 +1008,7 @@
 
       document.getElementById("vol-" + i).textContent = Math.round(s.level).toLocaleString() + " L";
       var hrs = hoursToEmpty(s);
-      document.getElementById("eta-" + i).textContent = hrs > 96 ? "96h+" : "~" + Math.round(hrs) + "h";
+      document.getElementById("eta-" + i).textContent = fmtEta(hrs);
       document.getElementById("risk-" + i).textContent = riskPct(hrs) + "%";
     });
     renderPriority();
@@ -864,23 +1020,57 @@
       .slice(0, 6);
     priorityBody.innerHTML = "";
     if (!ranked.length) {
-      priorityBody.innerHTML = '<tr><td colspan="6" class="no-results" style="border:none;">No stations in this selection.</td></tr>';
+      priorityBody.innerHTML = '<tr><td colspan="6" class="no-results" style="border:none;">' + t("noResults") + '</td></tr>';
       return;
     }
     ranked.forEach(function (r, idx) {
-      var pct = Math.max(0, Math.min(1, r.s.level / r.s.capacity));
-      var action = r.hrs < 4 ? { cls: "dispatch", label: "DISPATCH NOW" } : r.hrs < 12 ? { cls: "schedule", label: "SCHEDULE" } : { cls: "monitor", label: "MONITOR" };
+      var action = r.hrs < 4 ? { cls: "dispatch", label: t("actionDispatch") } : r.hrs < 12 ? { cls: "schedule", label: t("actionSchedule") } : { cls: "monitor", label: t("actionMonitor") };
       var tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="rank">' + (idx + 1) + '</td>' +
         '<td>' + r.s.code + '</td>' +
         '<td>' + r.s.district + '</td>' +
-        '<td class="num">' + (r.hrs > 96 ? "96h+" : "~" + Math.round(r.hrs) + "h") + '</td>' +
+        '<td class="num">' + fmtEta(r.hrs) + '</td>' +
         '<td class="num">' + riskPct(r.hrs) + '%</td>' +
         '<td><span class="action-badge action-badge--' + action.cls + '">' + action.label + '</span></td>';
       priorityBody.appendChild(tr);
     });
   }
+
+  // ---------- static text application ----------
+  function applyStaticText() {
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      el.textContent = t(key);
+    });
+    document.getElementById("sourcesLine").innerHTML = t("sourcesLine");
+    document.getElementById("simText").innerHTML = t("simText");
+    document.getElementById("pitchP1").textContent = t("pitchP1");
+    document.getElementById("pitchP2").textContent = t("pitchP2");
+    document.getElementById("pitchLi1").innerHTML = t("pitchLi1");
+    document.getElementById("pitchLi2").innerHTML = t("pitchLi2");
+    document.getElementById("pitchLi3").innerHTML = t("pitchLi3");
+    document.getElementById("pitchLi4").innerHTML = t("pitchLi4");
+    document.getElementById("signoffCred").textContent = t("signoffCred");
+    document.getElementById("disclaimer").innerHTML = t("disclaimer");
+    document.documentElement.lang = currentLang;
+  }
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.getElementById("langPt").setAttribute("aria-pressed", lang === "pt" ? "true" : "false");
+    document.getElementById("langEn").setAttribute("aria-pressed", lang === "en" ? "true" : "false");
+    applyStaticText();
+    populateProvinces();
+    populateMunicipios(provinceSelect.value);
+    renderDonut();
+    renderLegend();
+    renderGrid();
+    tickClock();
+  }
+
+  document.getElementById("langPt").addEventListener("click", function () { setLang("pt"); });
+  document.getElementById("langEn").addEventListener("click", function () { setLang("en"); });
 
   provinceSelect.addEventListener("change", function () {
     populateMunicipios(provinceSelect.value);
@@ -888,7 +1078,7 @@
   });
   municipioSelect.addEventListener("change", renderGrid);
 
-  renderGrid();
+  setLang("pt");
 
   var tickMs = reduceMotion ? 4000 : 1800;
   setInterval(function () {
