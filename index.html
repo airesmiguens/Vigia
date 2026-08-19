@@ -1,0 +1,905 @@
+<title>Vigia</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #F4F5F3;
+    --surface: #FCFCFB;
+    --surface-2: #ECEEEA;
+    --border: rgba(10,20,18,0.11);
+    --border-strong: rgba(10,20,18,0.20);
+    --text-primary: #10201C;
+    --text-secondary: #4B5850;
+    --text-muted: #7C877F;
+    --accent: #4a3aa7;
+    --accent-soft: rgba(74,58,167,0.10);
+    --accent-text: #4a3aa7;
+    --good: #0ca30c;
+    --warning: #b8790a;
+    --warning-dot: #fab219;
+    --critical: #d03b3b;
+    --cat-1: #2a78d6;
+    --cat-2: #eb6834;
+    --cat-3: #1baf7a;
+    --cat-4: #eda100;
+    --cat-5: #e87ba4;
+    --shadow-card: 0 1px 2px rgba(10,20,18,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0F1513;
+      --surface: #1A1A19;
+      --surface-2: #212926;
+      --border: rgba(243,245,242,0.10);
+      --border-strong: rgba(243,245,242,0.20);
+      --text-primary: #F3F5F2;
+      --text-secondary: #C3C2B7;
+      --text-muted: #8A9089;
+      --accent: #9085e9;
+      --accent-soft: rgba(144,133,233,0.16);
+      --accent-text: #b3abf0;
+      --good: #2fce2f;
+      --warning: #fab219;
+      --warning-dot: #fab219;
+      --critical: #e66767;
+      --cat-1: #3987e5;
+      --cat-2: #d95926;
+      --cat-3: #199e70;
+      --cat-4: #c98500;
+      --cat-5: #d55181;
+      --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0F1513;
+    --surface: #1A1A19;
+    --surface-2: #212926;
+    --border: rgba(243,245,242,0.10);
+    --border-strong: rgba(243,245,242,0.20);
+    --text-primary: #F3F5F2;
+    --text-secondary: #C3C2B7;
+    --text-muted: #8A9089;
+    --accent: #9085e9;
+    --accent-soft: rgba(144,133,233,0.16);
+    --accent-text: #b3abf0;
+    --good: #2fce2f;
+    --warning: #fab219;
+    --warning-dot: #fab219;
+    --critical: #e66767;
+    --cat-1: #3987e5;
+    --cat-2: #d95926;
+    --cat-3: #199e70;
+    --cat-4: #c98500;
+    --cat-5: #d55181;
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  a { color: var(--accent-text); }
+
+  .app {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 64px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 36px 0 22px;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 28px;
+  }
+  .masthead__eyebrow {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+  }
+  .masthead__title {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .masthead__sub {
+    margin: 10px 0 0;
+    max-width: 46ch;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+  .masthead__meta {
+    text-align: right;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+  .masthead__clock {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .masthead__meta .dim { color: var(--text-muted); }
+
+  /* ---------- Section labels ---------- */
+  .section-label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 16px;
+    flex-wrap: wrap;
+  }
+  .section-label__num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+  .section-label h2 {
+    font-size: 1.05rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  .section-label__note {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  section.block { margin-bottom: 46px; }
+
+  /* ---------- KPI strip ---------- */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .kpi-tile {
+    background: var(--surface);
+    padding: 18px 20px;
+  }
+  .kpi-tile__value {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--accent-text);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .kpi-tile__label {
+    margin-top: 6px;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    max-width: 24ch;
+  }
+  .sources-line {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* ---------- Market panel ---------- */
+  .market-panel {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+  }
+  .donut-wrap { display: flex; justify-content: center; }
+  .legend-table { width: 100%; border-collapse: collapse; }
+  .legend-table td { padding: 7px 6px; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+  .legend-table tr:last-child td { border-bottom: none; }
+  .legend-swatch { display:inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
+  .legend-name { color: var(--text-primary); }
+  .legend-share { text-align: right; font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .legend-stations { text-align: right; color: var(--text-muted); font-size: 0.78rem; font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace; }
+
+  @media (max-width: 640px) {
+    .market-panel { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Simulation banner ---------- */
+  .sim-banner {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--accent-soft);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+  }
+  .sim-banner__badge {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    background: var(--accent);
+    color: var(--surface);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .sim-banner p { margin: 0; font-size: 0.85rem; color: var(--text-secondary); }
+  .sim-banner strong { color: var(--text-primary); }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+  }
+  .filter-field { display: flex; align-items: center; gap: 8px; }
+  .filter-field label {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+  .filter-field select {
+    appearance: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font: inherit;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    padding: 6px 28px 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 14px) center, calc(100% - 9px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    color: var(--text-primary);
+  }
+  .filter-field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .filter-count {
+    margin-left: auto;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---------- Network grid ---------- */
+  .network-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+  }
+  .station-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: var(--shadow-card);
+  }
+  .station-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+  .station-code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+  .station-card__location { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; }
+  .station-card__location .dim { font-weight: 400; color: var(--text-muted); font-size: 0.8rem; }
+
+  .station-card__body { display: flex; gap: 16px; }
+
+  .tank { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
+  .tank__tube {
+    position: relative;
+    width: 30px;
+    height: 108px;
+    border-radius: 15px;
+    border: 2px solid var(--border-strong);
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .tank__fill {
+    position: absolute;
+    left: -2px; right: -2px; bottom: -2px;
+    border-radius: 13px;
+    height: 0%;
+  }
+  .tank__fill::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.35);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tank__fill { transition: height 0.9s ease, background-color 0.4s ease; }
+  }
+  .tank__mark {
+    position: absolute;
+    left: 3px; right: 3px;
+    bottom: 50%;
+    border-top: 1px dashed var(--border-strong);
+    height: 0;
+  }
+  .tank__value {
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 4px 8px 4px 6px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    flex: none;
+  }
+  .status-pill__dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .status-pill--good { color: var(--good); background: color-mix(in srgb, var(--good) 10%, transparent); }
+  .status-pill--good .status-pill__dot { background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 18%, transparent); }
+  .status-pill--warning { color: var(--warning); background: color-mix(in srgb, var(--warning-dot) 14%, transparent); }
+  .status-pill--warning .status-pill__dot { background: var(--warning-dot); box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning-dot) 20%, transparent); }
+  .status-pill--critical { color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, transparent); }
+  .status-pill--critical .status-pill__dot { background: var(--critical); box-shadow: 0 0 0 3px color-mix(in srgb, var(--critical) 20%, transparent); }
+
+  .station-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin: 0; font-size: 0.76rem; align-content: start; flex: 1; }
+  .station-stats dt { color: var(--text-muted); margin: 0 0 2px; }
+  .station-stats dd { margin: 0; font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; color: var(--text-primary); font-size: 0.82rem; }
+
+  .no-results { padding: 30px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-strong); border-radius: 10px; grid-column: 1 / -1; font-size: 0.85rem; }
+
+  /* ---------- Priority queue ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table.priority { width: 100%; border-collapse: collapse; min-width: 640px; }
+  table.priority th {
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    font-weight: 600;
+  }
+  table.priority td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  table.priority tr:last-child td { border-bottom: none; }
+  table.priority td.num { font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .rank { color: var(--text-muted); font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace; }
+  .action-badge {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  .action-badge--dispatch { background: color-mix(in srgb, var(--critical) 14%, transparent); color: var(--critical); }
+  .action-badge--schedule { background: color-mix(in srgb, var(--warning-dot) 16%, transparent); color: var(--warning); }
+  .action-badge--monitor { background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); }
+
+  /* ---------- Pitch panel ---------- */
+  .pitch-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 26px 28px;
+  }
+  .pitch-panel h3 { margin: 0 0 10px; font-size: 1.05rem; }
+  .pitch-panel p { color: var(--text-secondary); margin: 0 0 12px; max-width: 68ch; }
+  .pitch-panel ul { margin: 0; padding-left: 1.1em; color: var(--text-secondary); }
+  .pitch-panel li { margin-bottom: 6px; }
+
+  /* ---------- Footer / signature ---------- */
+  .signoff {
+    margin-top: 54px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-strong);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+  .signoff__name { color: var(--text-primary); font-weight: 700; font-size: 0.95rem; }
+  .signoff__cred { margin-top: 4px; line-height: 1.6; max-width: 44ch; }
+  .signoff__contact { text-align: right; font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace; font-size: 0.78rem; line-height: 1.9; }
+  .signoff__contact a { color: var(--text-secondary); text-decoration: none; }
+  .signoff__contact a:hover { color: var(--accent-text); }
+  .disclaimer {
+    margin-top: 20px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    max-width: 80ch;
+  }
+</style>
+
+<div class="app">
+
+  <header class="masthead">
+    <div>
+      <p class="masthead__eyebrow">Operational Intelligence — Demonstration Build</p>
+      <h1 class="masthead__title">VIGIA</h1>
+      <p class="masthead__sub">Live visibility into fuel-network stock levels and stockout risk — built to show what a distributor partnership could power across Angola's retail network.</p>
+    </div>
+    <div class="masthead__meta">
+      <div class="masthead__clock mono" id="clock">--:--:--</div>
+      <div id="clockDate" class="dim">Luanda</div>
+    </div>
+  </header>
+
+  <section class="block">
+    <div class="section-label">
+      <span class="section-label__num">01</span>
+      <h2>Angola's downstream fuel market</h2>
+      <span class="section-label__note">Sourced · Public data</span>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-tile">
+        <div class="kpi-tile__value">#2</div>
+        <div class="kpi-tile__label">Crude producer in Africa — yet a net importer of refined fuel, due to limited domestic refining capacity¹</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile__value">56%</div>
+        <div class="kpi-tile__label">Of retail stations sit inside just four distributor networks²</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile__value">44%</div>
+        <div class="kpi-tile__label">Of stations are independent "Bandeira Branca" operators, outside any single distributor²</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile__value">+31%</div>
+        <div class="kpi-tile__label">Projected growth in Angola's LPG demand by 2027³</div>
+      </div>
+    </div>
+    <div class="sources-line">¹ Angola Petroleum — Downstream Overview &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail &nbsp;·&nbsp; ³ Energy Capital &amp; Power, Angola downstream investment coverage</div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">
+      <span class="section-label__num">02</span>
+      <h2>Retail network by distributor</h2>
+      <span class="section-label__note">526 stations</span>
+    </div>
+    <div class="market-panel">
+      <div class="donut-wrap">
+        <svg width="180" height="180" viewBox="0 0 180 180" id="donut" role="img" aria-label="Market share by distributor"></svg>
+      </div>
+      <table class="legend-table" id="legendTable"></table>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">
+      <span class="section-label__num">03</span>
+      <h2>Live network simulation</h2>
+      <span class="section-label__note">Updating</span>
+    </div>
+
+    <div class="sim-banner">
+      <span class="sim-banner__badge">SIMULATED</span>
+      <p><strong>Station-level tank data below is synthetic</strong>, generated to demonstrate the analytics engine — capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 above are real, sourced figures. Connected to actual tank telemetry, this becomes a live operational feed — see section 05.</p>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label for="provinceSelect">Province</label>
+        <select id="provinceSelect"></select>
+      </div>
+      <div class="filter-field">
+        <label for="municipioSelect">Município</label>
+        <select id="municipioSelect"></select>
+      </div>
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <div class="network-grid" id="networkGrid"></div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">
+      <span class="section-label__num">04</span>
+      <h2>Priority resupply queue</h2>
+      <span class="section-label__note">Within current selection</span>
+    </div>
+    <div class="table-wrap">
+      <table class="priority">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Station</th>
+            <th>Município</th>
+            <th>Time to empty</th>
+            <th>Stockout risk (24h)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="priorityBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block pitch-panel">
+    <div class="section-label" style="margin-bottom:14px;">
+      <span class="section-label__num">05</span>
+      <h2>What this becomes with real telemetry</h2>
+    </div>
+    <p>This build runs entirely on public national statistics and a synthetic station simulation — no distributor data was used or requested to produce it. It exists to show the engine, not to claim access it doesn't have.</p>
+    <p>Connected to real inputs, the same architecture becomes an operational tool rather than a demonstration:</p>
+    <ul>
+      <li><strong>Tank-level feed</strong> — from existing automated gauges where installed, or low-cost ultrasonic/float retrofits where they aren't.</li>
+      <li><strong>Predictive stockout modeling</strong> — trained on real draw-down and delivery history instead of a synthetic rate.</li>
+      <li><strong>Delivery prioritization</strong> — a live, ranked dispatch queue instead of the illustrative one in section 04.</li>
+      <li><strong>Consumer-facing visibility</strong> — the same data, surfaced to drivers, reduces the "station-hopping" congestion that costs every station foot traffic and fuel.</li>
+    </ul>
+  </section>
+
+  <footer class="signoff">
+    <div>
+      <div class="signoff__name">Aires Augusto Miguêns</div>
+      <div class="signoff__cred">Data Scientist · MSc Data Science, Worcester Polytechnic Institute (exp. 2026) · Fulbright Scholar 2024–2026 · IEEE HealthCom 2026 (peer-reviewed) · Harvard Health System Innovation Lab, Research Collaborator</div>
+    </div>
+    <div class="signoff__contact">
+      <div><a href="mailto:airesmiguens@gmail.com">airesmiguens@gmail.com</a></div>
+      <div>+244 931 391 063</div>
+      <div><a href="https://airestech.us">airestech.us</a></div>
+      <div>Kilamba Kiaxi, Luanda</div>
+    </div>
+  </footer>
+
+  <p class="disclaimer">Vigia is an independent proof-of-capability prototype prepared by Aires Miguêns and is not affiliated with, endorsed by, or built using data from Sonangol, Pumangol, Galp/Sonangalp or TotalEnergies. Market-share figures in section 02 are drawn from published third-party reporting (S&amp;P Global, Angola Petroleum); station-level data in sections 03–04 is synthetic and illustrative only.</p>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- seeded RNG ----------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var rng = mulberry32(19790821);
+
+  // ---------- clock ----------
+  var clockEl = document.getElementById("clock");
+  var clockDateEl = document.getElementById("clockDate");
+  function tickClock() {
+    var now = new Date();
+    var timeFmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Africa/Luanda", hour12: false });
+    var dateFmt = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Africa/Luanda" });
+    clockEl.textContent = timeFmt.format(now);
+    clockDateEl.textContent = "Luanda · " + dateFmt.format(now);
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  // ---------- market share (real, sourced) ----------
+  var market = [
+    { name: "Bandeira Branca (independent)", share: 44, stations: 393, color: "var(--cat-1)" },
+    { name: "Sonangol Distribuidora", share: 36, stations: 326, color: "var(--cat-2)" },
+    { name: "Pumangol", share: 9, stations: 78, color: "var(--cat-3)" },
+    { name: "Sonangalp (Galp)", share: 7, stations: 60, color: "var(--cat-4)" },
+    { name: "Tomsa (TotalEnergies)", share: 4, stations: 41, color: "var(--cat-5)" }
+  ];
+
+  (function renderDonut() {
+    var svg = document.getElementById("donut");
+    var cx = 90, cy = 90, r = 68, sw = 24;
+    var circumference = 2 * Math.PI * r;
+    var offset = 0;
+    var ns = "http://www.w3.org/2000/svg";
+    market.forEach(function (m) {
+      var len = (m.share / 100) * circumference;
+      var gap = 2;
+      var circle = document.createElementNS(ns, "circle");
+      circle.setAttribute("cx", cx);
+      circle.setAttribute("cy", cy);
+      circle.setAttribute("r", r);
+      circle.setAttribute("fill", "none");
+      circle.setAttribute("stroke", m.color);
+      circle.setAttribute("stroke-width", sw);
+      circle.setAttribute("stroke-dasharray", Math.max(len - gap, 1) + " " + (circumference - len + gap));
+      circle.setAttribute("stroke-dashoffset", -offset);
+      circle.setAttribute("transform", "rotate(-90 " + cx + " " + cy + ")");
+      var title = document.createElementNS(ns, "title");
+      title.textContent = m.name + " — " + m.share + "% (" + m.stations + " stations)";
+      circle.appendChild(title);
+      svg.appendChild(circle);
+      offset += len;
+    });
+    var centerText = document.createElementNS(ns, "text");
+    centerText.setAttribute("x", cx);
+    centerText.setAttribute("y", cy - 4);
+    centerText.setAttribute("text-anchor", "middle");
+    centerText.setAttribute("class", "mono");
+    centerText.setAttribute("font-size", "22");
+    centerText.setAttribute("font-weight", "600");
+    centerText.setAttribute("fill", "currentColor");
+    centerText.textContent = "526";
+    svg.appendChild(centerText);
+    var centerSub = document.createElementNS(ns, "text");
+    centerSub.setAttribute("x", cx);
+    centerSub.setAttribute("y", cy + 14);
+    centerSub.setAttribute("text-anchor", "middle");
+    centerSub.setAttribute("font-size", "10");
+    centerSub.setAttribute("fill", "currentColor");
+    centerSub.setAttribute("opacity", "0.55");
+    centerSub.textContent = "stations";
+    svg.appendChild(centerSub);
+  })();
+
+  (function renderLegend() {
+    var table = document.getElementById("legendTable");
+    market.forEach(function (m) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td><span class="legend-swatch" style="background:' + m.color + '"></span><span class="legend-name">' + m.name + '</span></td>' +
+        '<td class="legend-share">' + m.share + '%</td>' +
+        '<td class="legend-stations">' + m.stations + ' stations</td>';
+      table.appendChild(tr);
+    });
+  })();
+
+  // ---------- simulated station network (real provinces/municípios) ----------
+  var geography = {
+    "Luanda": ["Kilamba Kiaxi", "Talatona", "Viana", "Ingombota", "Maianga", "Cazenga", "Rangel", "Cacuaco", "Belas", "Sambizanga"],
+    "Benguela": ["Benguela", "Lobito", "Baía Farta", "Catumbela"],
+    "Huíla": ["Lubango", "Matala", "Humpata"],
+    "Huambo": ["Huambo", "Caála", "Bailundo"]
+  };
+
+  var stations = [];
+  Object.keys(geography).forEach(function (province) {
+    geography[province].forEach(function (municipio) {
+      var idx = stations.length;
+      var capacity = Math.round((22000 + rng() * 20000) / 500) * 500;
+      var pct = 0.08 + rng() * 0.9;
+      var rate = Math.round(280 + rng() * 620);
+      stations.push({
+        code: "PST-" + String(idx + 1).padStart(2, "0"),
+        province: province,
+        district: municipio,
+        capacity: capacity,
+        level: capacity * pct,
+        rate: rate
+      });
+    });
+  });
+  // force a spread of dramatic states across different provinces so the demo reads immediately in any filter
+  function forceState(district, pctOfCap, rate) {
+    var s = stations.find(function (x) { return x.district === district; });
+    if (s) { s.level = s.capacity * pctOfCap; if (rate) s.rate = rate; }
+  }
+  forceState("Viana", 0.09, 540);
+  forceState("Cazenga", 0.03, 668);
+  forceState("Rangel", 0.30);
+  forceState("Cacuaco", 0.35);
+  forceState("Sambizanga", 0.20);
+  forceState("Lobito", 0.07, 610);
+  forceState("Matala", 0.28);
+  forceState("Caála", 0.11, 470);
+
+  var gridEl = document.getElementById("networkGrid");
+  var priorityBody = document.getElementById("priorityBody");
+  var provinceSelect = document.getElementById("provinceSelect");
+  var municipioSelect = document.getElementById("municipioSelect");
+  var filterCountEl = document.getElementById("filterCount");
+
+  function populateProvinces() {
+    var opts = ['<option value="all">All provinces</option>'];
+    Object.keys(geography).forEach(function (p) {
+      opts.push('<option value="' + p + '">' + p + '</option>');
+    });
+    provinceSelect.innerHTML = opts.join("");
+  }
+  function populateMunicipios(province) {
+    var opts = ['<option value="all">All municípios</option>'];
+    var list = province === "all"
+      ? Object.keys(geography).reduce(function (acc, p) { return acc.concat(geography[p]); }, [])
+      : geography[province] || [];
+    list.forEach(function (m) { opts.push('<option value="' + m + '">' + m + '</option>'); });
+    municipioSelect.innerHTML = opts.join("");
+  }
+  populateProvinces();
+  populateMunicipios("all");
+
+  function currentFilter() {
+    return { province: provinceSelect.value, municipio: municipioSelect.value };
+  }
+  function filteredStations() {
+    var f = currentFilter();
+    return stations.filter(function (s) {
+      return (f.province === "all" || s.province === f.province) &&
+             (f.municipio === "all" || s.district === f.municipio);
+    });
+  }
+
+  function statusFor(pct) {
+    if (pct <= 0.15) return { key: "critical", label: "CRITICAL" };
+    if (pct <= 0.4) return { key: "warning", label: "LOW" };
+    return { key: "good", label: "READY" };
+  }
+  function hoursToEmpty(s) {
+    return s.rate > 0 ? s.level / s.rate : 999;
+  }
+  function riskPct(hrs) {
+    return Math.max(3, Math.min(97, Math.round(100 - (hrs / 30) * 100)));
+  }
+
+  function buildCard(s) {
+    var i = stations.indexOf(s);
+    var card = document.createElement("article");
+    card.className = "station-card";
+
+    var head = document.createElement("div");
+    head.className = "station-card__head";
+    head.innerHTML = '<span class="station-code">' + s.code + '</span>' +
+      '<span class="status-pill" id="pill-' + i + '"><span class="status-pill__dot"></span><span class="status-pill__label"></span></span>';
+    card.appendChild(head);
+
+    var loc = document.createElement("div");
+    loc.className = "station-card__location";
+    loc.innerHTML = s.district + ' <span class="dim">· ' + s.province + '</span>';
+    card.appendChild(loc);
+
+    var body = document.createElement("div");
+    body.className = "station-card__body";
+    body.innerHTML =
+      '<div class="tank">' +
+        '<div class="tank__tube"><div class="tank__mark"></div><div class="tank__fill" id="fill-' + i + '"></div></div>' +
+        '<div class="tank__value mono" id="val-' + i + '">0%</div>' +
+      '</div>' +
+      '<dl class="station-stats">' +
+        '<div><dt>Est. volume</dt><dd id="vol-' + i + '"></dd></div>' +
+        '<div><dt>Draw-down</dt><dd>' + s.rate.toLocaleString() + ' L/h</dd></div>' +
+        '<div><dt>Time to empty</dt><dd id="eta-' + i + '"></dd></div>' +
+        '<div><dt>Stockout risk (24h)</dt><dd id="risk-' + i + '"></dd></div>' +
+      '</dl>';
+    card.appendChild(body);
+    return card;
+  }
+
+  function renderGrid() {
+    var visible = filteredStations();
+    gridEl.innerHTML = "";
+    if (!visible.length) {
+      var empty = document.createElement("div");
+      empty.className = "no-results";
+      empty.textContent = "No stations in this selection.";
+      gridEl.appendChild(empty);
+    } else {
+      visible.forEach(function (s) { gridEl.appendChild(buildCard(s)); });
+    }
+    filterCountEl.textContent = visible.length + " of " + stations.length + " stations";
+    updateValues();
+  }
+
+  function updateValues() {
+    var circumference = 0; // unused, kept for clarity of intent removal
+    stations.forEach(function (s, i) {
+      var fillEl = document.getElementById("fill-" + i);
+      if (!fillEl) return; // not currently rendered (filtered out)
+      var pct = Math.max(0, Math.min(1, s.level / s.capacity));
+      var st = statusFor(pct);
+      var color = st.key === "good" ? "var(--good)" : st.key === "warning" ? "var(--warning-dot)" : "var(--critical)";
+      fillEl.style.height = (pct * 100).toFixed(1) + "%";
+      fillEl.style.background = color;
+
+      document.getElementById("val-" + i).textContent = Math.round(pct * 100) + "%";
+
+      var pill = document.getElementById("pill-" + i);
+      pill.className = "status-pill status-pill--" + st.key;
+      pill.querySelector(".status-pill__label").textContent = st.label;
+
+      document.getElementById("vol-" + i).textContent = Math.round(s.level).toLocaleString() + " L";
+      var hrs = hoursToEmpty(s);
+      document.getElementById("eta-" + i).textContent = hrs > 96 ? "96h+" : "~" + Math.round(hrs) + "h";
+      document.getElementById("risk-" + i).textContent = riskPct(hrs) + "%";
+    });
+    renderPriority();
+  }
+
+  function renderPriority() {
+    var ranked = filteredStations().map(function (s) { return { s: s, hrs: hoursToEmpty(s) }; })
+      .sort(function (a, b) { return a.hrs - b.hrs; })
+      .slice(0, 6);
+    priorityBody.innerHTML = "";
+    if (!ranked.length) {
+      priorityBody.innerHTML = '<tr><td colspan="6" class="no-results" style="border:none;">No stations in this selection.</td></tr>';
+      return;
+    }
+    ranked.forEach(function (r, idx) {
+      var pct = Math.max(0, Math.min(1, r.s.level / r.s.capacity));
+      var action = r.hrs < 4 ? { cls: "dispatch", label: "DISPATCH NOW" } : r.hrs < 12 ? { cls: "schedule", label: "SCHEDULE" } : { cls: "monitor", label: "MONITOR" };
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="rank">' + (idx + 1) + '</td>' +
+        '<td>' + r.s.code + '</td>' +
+        '<td>' + r.s.district + '</td>' +
+        '<td class="num">' + (r.hrs > 96 ? "96h+" : "~" + Math.round(r.hrs) + "h") + '</td>' +
+        '<td class="num">' + riskPct(r.hrs) + '%</td>' +
+        '<td><span class="action-badge action-badge--' + action.cls + '">' + action.label + '</span></td>';
+      priorityBody.appendChild(tr);
+    });
+  }
+
+  provinceSelect.addEventListener("change", function () {
+    populateMunicipios(provinceSelect.value);
+    renderGrid();
+  });
+  municipioSelect.addEventListener("change", renderGrid);
+
+  renderGrid();
+
+  var tickMs = reduceMotion ? 4000 : 1800;
+  setInterval(function () {
+    stations.forEach(function (s) {
+      var jitter = 0.6 + rng() * 0.8;
+      s.level -= (s.rate / 3600) * (tickMs / 1000) * 90 * jitter;
+      if (s.level <= 0) {
+        s.level = s.capacity; // simulated resupply
+      }
+    });
+    updateValues();
+  }, tickMs);
+})();
+</script>
