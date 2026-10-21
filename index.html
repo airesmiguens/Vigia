@@ -519,19 +519,19 @@
     </div>
     <div class="kpi-strip">
       <div class="kpi-tile">
-        <div class="kpi-tile__value">#2</div>
+        <div class="kpi-tile__value">326</div>
         <div class="kpi-tile__label" data-i18n="kpi1Label"></div>
       </div>
       <div class="kpi-tile">
-        <div class="kpi-tile__value">56%</div>
+        <div class="kpi-tile__value">58%</div>
         <div class="kpi-tile__label" data-i18n="kpi2Label"></div>
       </div>
       <div class="kpi-tile">
-        <div class="kpi-tile__value">44%</div>
+        <div class="kpi-tile__value">Kz 400</div>
         <div class="kpi-tile__label" data-i18n="kpi3Label"></div>
       </div>
       <div class="kpi-tile">
-        <div class="kpi-tile__value">+31%</div>
+        <div class="kpi-tile__value">30 000</div>
         <div class="kpi-tile__label" data-i18n="kpi4Label"></div>
       </div>
     </div>
@@ -576,6 +576,25 @@
       <span class="filter-count" id="filterCount"></span>
     </div>
 
+    <div class="kpi-strip" style="margin-bottom:18px;">
+      <div class="kpi-tile">
+        <div class="kpi-tile__value" id="riskCriticalVal" style="color:var(--critical)">0</div>
+        <div class="kpi-tile__label" data-i18n="riskCritical"></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile__value" id="riskAtRiskVal" style="color:var(--warning)">0</div>
+        <div class="kpi-tile__label" data-i18n="riskAtRisk"></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile__value" id="riskLitresVal">0</div>
+        <div class="kpi-tile__label" data-i18n="riskLitres"></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-tile__value" id="riskKzVal">0</div>
+        <div class="kpi-tile__label" data-i18n="riskKz"></div>
+      </div>
+    </div>
+
     <div class="network-grid" id="networkGrid"></div>
   </section>
 
@@ -608,12 +627,13 @@
       <h2 data-i18n="section5Title"></h2>
     </div>
     <p id="pitchP1"></p>
-    <p id="pitchP2"></p>
     <ul>
       <li id="pitchLi1"></li>
       <li id="pitchLi2"></li>
       <li id="pitchLi3"></li>
       <li id="pitchLi4"></li>
+      <li id="pitchLi5"></li>
+      <li id="pitchLi6"></li>
     </ul>
   </section>
 
@@ -653,27 +673,32 @@
   // ---------- i18n ----------
   var i18n = {
     pt: {
-      eyebrow: "Inteligência Operacional — Versão de Demonstração",
-      subtitle: "Visibilidade em tempo real sobre os níveis de stock e o risco de rutura na rede de combustíveis — construído para mostrar o que uma parceria com um distribuidor poderia potenciar em toda a rede retalhista de Angola.",
-      section1Title: "O mercado de combustíveis a jusante de Angola",
+      eyebrow: "Preparado para a Sonangol Distribuidora · Versão de demonstração",
+      subtitle: "Visibilidade em tempo real dos níveis de stock e do risco de rutura nos postos da Sonangol Distribuidora — uma demonstração do que a telemetria dos tanques pode fazer pela maior rede de combustíveis de Angola.",
+      section1Title: "A Sonangol Distribuidora em números",
       section1Note: "Fontes · Dados públicos",
-      kpi1Label: "Maior produtor de petróleo bruto de África — mas importador líquido de combustível refinado, devido à capacidade limitada de refinação nacional¹",
-      kpi2Label: "Dos postos de venda pertencem a apenas quatro redes de distribuidores²",
-      kpi3Label: 'Dos postos são operadores independentes "Bandeira Branca", fora de qualquer distribuidor²',
-      kpi4Label: "Crescimento previsto da procura de GPL em Angola até 2027³",
-      sourcesLine: "¹ Angola Petroleum — Visão Geral do Downstream &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail &nbsp;·&nbsp; ³ Energy Capital &amp; Power, cobertura de investimento downstream em Angola",
-      section2Title: "Rede de retalho por distribuidor",
-      section2Note: "526 postos",
+      kpi1Label: "Postos de abastecimento na rede Sonangol — a maior rede de marca em Angola, 36% de todos os postos do país¹",
+      kpi2Label: "Quota da Sonangol no mercado de produtos petrolíferos — a maior responsabilidade logística do downstream angolano²",
+      kpi3Label: "Preço do gasóleo por litro desde jul. 2025, após duas subidas no ano (Kz 200 → 300 → 400) — cada litro perdido por rutura vale o dobro do que valia³",
+      kpi4Label: "Barris/dia na 1.ª fase da Refinaria de Cabinda, inaugurada em set. 2025 — o abastecimento nacional está a mudar, e a distribuição tem de acompanhar⁴",
+      sourcesLine: "¹ ANGOP, 2026 &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail (dados de 2023) &nbsp;·&nbsp; ³ Rigzone, mar. 2025; FurtherAfrica, jul. 2025 &nbsp;·&nbsp; ⁴ S&amp;P Global Commodity Insights, set. 2025",
+      section2Title: "A Sonangol na rede nacional de postos",
+      section2Note: "898 postos · ANGOP",
       donutStations: "postos",
-      section3Title: "Simulação da rede em tempo real",
+      donutCenter: "da rede",
+      section3Title: "Rede Sonangol — simulação em tempo real",
       section3Note: "A atualizar",
       simBadge: "SIMULADO",
-      simText: '<strong>Os dados ao nível dos postos abaixo são sintéticos</strong>, gerados para demonstrar o motor analítico — capacidades, taxas de consumo e previsão de rutura são modelados, não medidos. As secções 01–02 acima são dados reais, com fontes. Ligado a telemetria real dos tanques, isto torna-se um fluxo operacional ao vivo — ver secção 05.',
+      simText: '<strong>Os dados dos postos abaixo são sintéticos</strong> — nenhum dado da Sonangol foi usado. Capacidades, consumos e previsões de rutura são modelados, não medidos. As secções 01–02 são dados públicos, com fontes. Ligado às leituras reais dos tanques da Sonangol, isto torna-se um painel operacional — ver secção 05.',
+      riskCritical: "Postos críticos agora",
+      riskAtRisk: "Postos que esgotam em 24h",
+      riskLitres: "Litros de vendas em risco (24h)",
+      riskKz: "Vendas em risco (24h), a Kz 400/L",
       filterProvinceLabel: "Província",
       filterMunicipioLabel: "Município",
       filterAllProvinces: "Todas as províncias",
       filterAllMunicipios: "Todos os municípios",
-      filterCount: function (n, total) { return n + " de " + total + " postos"; },
+      filterCount: function (n, total) { return n + " de " + total + " postos simulados"; },
       statVolume: "Volume estimado",
       statDrawdown: "Consumo",
       statEta: "Tempo até esgotar",
@@ -695,39 +720,45 @@
       noResults: "Nenhum posto nesta seleção.",
       etaPlus: "96h+",
       etaPrefix: "~",
-      section5Title: "O que isto se torna com telemetria real",
-      pitchP1: "Esta versão funciona inteiramente com estatísticas públicas nacionais e uma simulação sintética de postos — não foram usados nem solicitados dados de qualquer distribuidor para a produzir. Existe para mostrar o motor, não para reivindicar um acesso que não tem.",
-      pitchP2: "Ligado a dados reais, a mesma arquitetura torna-se uma ferramenta operacional em vez de uma demonstração:",
-      pitchLi1: "<strong>Fluxo de nível de tanque</strong> — a partir de sensores automáticos já existentes, ou de retrofits de baixo custo (ultrassónicos/boia) onde não existem.",
-      pitchLi2: "<strong>Modelação preditiva de rutura</strong> — treinada com histórico real de consumo e entregas, em vez de uma taxa sintética.",
-      pitchLi3: "<strong>Priorização de entregas</strong> — uma fila de despacho real e classificada, em vez da ilustrativa na secção 04.",
-      pitchLi4: '<strong>Visibilidade para o condutor</strong> — os mesmos dados, mostrados aos condutores, reduzem a "procura de posto em posto" que custa tráfego e combustível a cada estação.',
+      section5Title: "Proposta: piloto de 90 dias com a Sonangol Distribuidora",
+      pitchP1: "Esta demonstração usa apenas dados públicos e uma simulação — nenhum dado da Sonangol foi usado ou solicitado. A proposta é um passo pequeno e mensurável para a tornar real, em linha com o programa de requalificação da rede iniciado em 2025:",
+      pitchLi1: "<strong>Semanas 1–2 · Levantamento</strong> — 10 a 20 postos em Luanda (ex.: Talatona, Kilamba Kiaxi, Viana). Identificar onde já existem medidores automáticos de tanque e onde é preciso instalar sensores de baixo custo (ultrassónicos/boia).",
+      pitchLi2: "<strong>Semanas 3–8 · Ligação</strong> — leituras reais dos tanques a alimentar este painel, com alertas de stock baixo para a equipa de operações.",
+      pitchLi3: "<strong>Semanas 9–12 · Previsão e despacho</strong> — modelo de rutura treinado com o histórico real de vendas e entregas, e uma fila de despacho priorizada para os camiões-cisterna.",
+      pitchLi4: "<strong>Como medimos o sucesso</strong> — horas de posto seco, número de ruturas e entregas de emergência, comparados com o período antes do piloto.",
+      pitchLi5: "<strong>O que é preciso da Sonangol</strong> — acesso às leituras dos tanques (ou autorização para instalar sensores) e ao histórico de entregas dos postos do piloto.",
+      pitchLi6: "<strong>Os dados são da Sonangol</strong> — ficam sob controlo da Sonangol, alojados onde a Sonangol definir, e não são partilhados com terceiros.",
       signoffCred: "Cientista de Dados · Mestrado em Ciência de Dados, Worcester Polytechnic Institute (prev. 2026) · Bolseiro Fulbright 2024–2026 · IEEE HealthCom 2026 (revisto por pares) · Harvard Health System Innovation Lab, Colaborador de Investigação",
-      disclaimer: 'O Vigia é um protótipo independente de prova de capacidade, preparado por Aires Miguêns, sem afiliação ou aprovação da Sonangol, Pumangol, Galp/Sonangalp ou TotalEnergies, e não construído com dados destas empresas. Os valores de quota de mercado na secção 02 provêm de fontes públicas de terceiros (S&amp;P Global, Angola Petroleum); os dados ao nível dos postos nas secções 03–04 são sintéticos e apenas ilustrativos.',
-      marketNames: ["Bandeira Branca (independente)", "Sonangol Distribuidora", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
+      disclaimer: 'O Vigia é um protótipo independente preparado por Aires Miguêns para apresentação à Sonangol Distribuidora. Não é afiliado nem aprovado pela Sonangol, e não foi construído com dados da Sonangol. Os números das secções 01–02 vêm de fontes públicas (ANGOP, S&amp;P Global, imprensa especializada); os dados dos postos nas secções 03–04 são sintéticos e apenas ilustrativos.',
+      marketNames: ["Sonangol Distribuidora", "Bandeira Branca (independentes)", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
     },
     en: {
-      eyebrow: "Operational Intelligence — Demonstration Build",
-      subtitle: "Live visibility into fuel-network stock levels and stockout risk — built to show what a distributor partnership could power across Angola's retail network.",
-      section1Title: "Angola's downstream fuel market",
+      eyebrow: "Prepared for Sonangol Distribuidora · Demonstration build",
+      subtitle: "Live visibility into stock levels and stockout risk across Sonangol Distribuidora's stations — a demonstration of what tank telemetry can do for Angola's largest fuel network.",
+      section1Title: "Sonangol Distribuidora by the numbers",
       section1Note: "Sourced · Public data",
-      kpi1Label: "Crude producer in Africa — yet a net importer of refined fuel, due to limited domestic refining capacity¹",
-      kpi2Label: "Of retail stations sit inside just four distributor networks²",
-      kpi3Label: 'Of stations are independent "Bandeira Branca" operators, outside any single distributor²',
-      kpi4Label: "Projected growth in Angola's LPG demand by 2027³",
-      sourcesLine: "¹ Angola Petroleum — Downstream Overview &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail &nbsp;·&nbsp; ³ Energy Capital &amp; Power, Angola downstream investment coverage",
-      section2Title: "Retail network by distributor",
-      section2Note: "526 stations",
+      kpi1Label: "Retail stations in the Sonangol network — Angola's largest branded network, 36% of all stations nationwide¹",
+      kpi2Label: "Sonangol's share of the oil-products market — the largest logistics responsibility in Angola's downstream²",
+      kpi3Label: "Diesel price per litre since Jul 2025, after two rises that year (Kz 200 → 300 → 400) — every litre lost to a stockout is worth twice what it was³",
+      kpi4Label: "Barrels/day in phase 1 of the Cabinda Refinery, inaugurated Sep 2025 — national supply is changing, and distribution has to keep up⁴",
+      sourcesLine: "¹ ANGOP, 2026 &nbsp;·&nbsp; ² S&amp;P Global, Angola Fuel Retail (2023 data) &nbsp;·&nbsp; ³ Rigzone, Mar 2025; FurtherAfrica, Jul 2025 &nbsp;·&nbsp; ⁴ S&amp;P Global Commodity Insights, Sep 2025",
+      section2Title: "Sonangol in the national station network",
+      section2Note: "898 stations · ANGOP",
       donutStations: "stations",
-      section3Title: "Live network simulation",
+      donutCenter: "of network",
+      section3Title: "Sonangol network — live simulation",
       section3Note: "Updating",
       simBadge: "SIMULATED",
-      simText: '<strong>Station-level tank data below is synthetic</strong>, generated to demonstrate the analytics engine — capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 above are real, sourced figures. Connected to actual tank telemetry, this becomes a live operational feed — see section 05.',
+      simText: '<strong>Station data below is synthetic</strong> — no Sonangol data was used. Capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 are public, sourced figures. Connected to Sonangol\'s real tank readings, this becomes an operational dashboard — see section 05.',
+      riskCritical: "Stations critical now",
+      riskAtRisk: "Stations running dry within 24h",
+      riskLitres: "Litres of sales at risk (24h)",
+      riskKz: "Sales at risk (24h), at Kz 400/L",
       filterProvinceLabel: "Province",
       filterMunicipioLabel: "Municipality",
       filterAllProvinces: "All provinces",
       filterAllMunicipios: "All municipalities",
-      filterCount: function (n, total) { return n + " of " + total + " stations"; },
+      filterCount: function (n, total) { return n + " of " + total + " simulated stations"; },
       statVolume: "Est. volume",
       statDrawdown: "Draw-down",
       statEta: "Time to empty",
@@ -749,16 +780,17 @@
       noResults: "No stations in this selection.",
       etaPlus: "96h+",
       etaPrefix: "~",
-      section5Title: "What this becomes with real telemetry",
-      pitchP1: "This build runs entirely on public national statistics and a synthetic station simulation — no distributor data was used or requested to produce it. It exists to show the engine, not to claim access it doesn't have.",
-      pitchP2: "Connected to real inputs, the same architecture becomes an operational tool rather than a demonstration:",
-      pitchLi1: "<strong>Tank-level feed</strong> — from existing automated gauges where installed, or low-cost ultrasonic/float retrofits where they aren't.",
-      pitchLi2: "<strong>Predictive stockout modeling</strong> — trained on real draw-down and delivery history instead of a synthetic rate.",
-      pitchLi3: "<strong>Delivery prioritization</strong> — a live, ranked dispatch queue instead of the illustrative one in section 04.",
-      pitchLi4: '<strong>Consumer-facing visibility</strong> — the same data, surfaced to drivers, reduces the "station-hopping" congestion that costs every station foot traffic and fuel.',
+      section5Title: "Proposal: a 90-day pilot with Sonangol Distribuidora",
+      pitchP1: "This demonstration uses only public data and a simulation — no Sonangol data was used or requested. The proposal is a small, measurable step to make it real, in line with the network requalification programme Sonangol began in 2025:",
+      pitchLi1: "<strong>Weeks 1–2 · Survey</strong> — 10 to 20 stations in Luanda (e.g. Talatona, Kilamba Kiaxi, Viana). Identify where automatic tank gauges already exist and where low-cost sensors (ultrasonic/float) need to be fitted.",
+      pitchLi2: "<strong>Weeks 3–8 · Connect</strong> — real tank readings feeding this dashboard, with low-stock alerts for the operations team.",
+      pitchLi3: "<strong>Weeks 9–12 · Forecast and dispatch</strong> — a stockout model trained on real sales and delivery history, and a prioritised dispatch queue for the tanker fleet.",
+      pitchLi4: "<strong>How we measure success</strong> — hours stations spend dry, number of stockouts and emergency deliveries, compared with the period before the pilot.",
+      pitchLi5: "<strong>What's needed from Sonangol</strong> — access to tank readings (or permission to fit sensors) and delivery history for the pilot stations.",
+      pitchLi6: "<strong>The data belongs to Sonangol</strong> — it stays under Sonangol's control, hosted wherever Sonangol decides, and is not shared with third parties.",
       signoffCred: "Data Scientist · MSc Data Science, Worcester Polytechnic Institute (exp. 2026) · Fulbright Scholar 2024–2026 · IEEE HealthCom 2026 (peer-reviewed) · Harvard Health System Innovation Lab, Research Collaborator",
-      disclaimer: 'Vigia is an independent proof-of-capability prototype prepared by Aires Miguêns and is not affiliated with, endorsed by, or built using data from Sonangol, Pumangol, Galp/Sonangalp or TotalEnergies. Market-share figures in section 02 are drawn from published third-party reporting (S&amp;P Global, Angola Petroleum); station-level data in sections 03–04 is synthetic and illustrative only.',
-      marketNames: ["Bandeira Branca (independent)", "Sonangol Distribuidora", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
+      disclaimer: 'Vigia is an independent prototype prepared by Aires Miguêns for presentation to Sonangol Distribuidora. It is not affiliated with or endorsed by Sonangol, and was not built using Sonangol data. Figures in sections 01–02 come from public sources (ANGOP, S&amp;P Global, trade press); station data in sections 03–04 is synthetic and illustrative only.',
+      marketNames: ["Sonangol Distribuidora", "Bandeira Branca (independents)", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
     }
   };
   var currentLang = "pt";
@@ -780,13 +812,12 @@
 
   // ---------- market share (real, sourced) ----------
   var marketBase = [
-    { share: 44, stations: 393, color: "var(--cat-1)" },
-    { share: 36, stations: 326, color: "var(--cat-2)" },
-    { share: 9, stations: 78, color: "var(--cat-3)" },
-    { share: 7, stations: 60, color: "var(--cat-4)" },
-    { share: 4, stations: 41, color: "var(--cat-5)" }
+    { share: 36, stations: 326, color: "var(--accent)" },
+    { share: 44, stations: 393, color: "color-mix(in srgb, var(--text-muted) 55%, transparent)" },
+    { share: 9, stations: 78, color: "color-mix(in srgb, var(--text-muted) 40%, transparent)" },
+    { share: 7, stations: 60, color: "color-mix(in srgb, var(--text-muted) 30%, transparent)" },
+    { share: 4, stations: 41, color: "color-mix(in srgb, var(--text-muted) 20%, transparent)" }
   ];
-
   var donutSvg = document.getElementById("donut");
   var legendTableEl = document.getElementById("legendTable");
   var ns = "http://www.w3.org/2000/svg";
@@ -805,7 +836,7 @@
       circle.setAttribute("cy", cy);
       circle.setAttribute("r", r);
       circle.setAttribute("fill", "none");
-      circle.setAttribute("stroke", m.color);
+      circle.style.stroke = m.color;
       circle.setAttribute("stroke-width", sw);
       circle.setAttribute("stroke-dasharray", Math.max(len - gap, 1) + " " + (circumference - len + gap));
       circle.setAttribute("stroke-dashoffset", -offset);
@@ -824,7 +855,7 @@
     centerText.setAttribute("font-size", "22");
     centerText.setAttribute("font-weight", "600");
     centerText.setAttribute("fill", "currentColor");
-    centerText.textContent = "526";
+    centerText.textContent = marketBase[0].share + "%";
     donutSvg.appendChild(centerText);
     var centerSub = document.createElementNS(ns, "text");
     centerSub.setAttribute("x", cx);
@@ -833,7 +864,7 @@
     centerSub.setAttribute("font-size", "10");
     centerSub.setAttribute("fill", "currentColor");
     centerSub.setAttribute("opacity", "0.55");
-    centerSub.textContent = t("donutStations");
+    centerSub.textContent = t("donutCenter");
     donutSvg.appendChild(centerSub);
   }
 
@@ -855,7 +886,8 @@
     "Luanda": ["Kilamba Kiaxi", "Talatona", "Viana", "Ingombota", "Maianga", "Cazenga", "Rangel", "Cacuaco", "Belas", "Sambizanga"],
     "Benguela": ["Benguela", "Lobito", "Baía Farta", "Catumbela"],
     "Huíla": ["Lubango", "Matala", "Humpata"],
-    "Huambo": ["Huambo", "Caála", "Bailundo"]
+    "Huambo": ["Huambo", "Caála", "Bailundo"],
+    "Cabinda": ["Cabinda", "Cacongo"]
   };
 
   var stations = [];
@@ -1012,6 +1044,25 @@
       document.getElementById("risk-" + i).textContent = riskPct(hrs) + "%";
     });
     renderPriority();
+    renderRiskSummary();
+  }
+
+  // ---------- revenue at risk (simulated stations, diesel at Kz 400/L) ----------
+  var pricePerLitreKz = 400;
+  function renderRiskSummary() {
+    var visible = filteredStations();
+    var critical = 0, atRisk = 0, litres = 0;
+    visible.forEach(function (s) {
+      var hrs = hoursToEmpty(s);
+      if (statusFor(s.level / s.capacity).key === "critical") critical++;
+      if (hrs < 24) { atRisk++; litres += (24 - hrs) * s.rate; }
+    });
+    var locale = currentLang === "pt" ? "pt-PT" : "en-GB";
+    var kz = litres * pricePerLitreKz;
+    document.getElementById("riskCriticalVal").textContent = critical;
+    document.getElementById("riskAtRiskVal").textContent = atRisk;
+    document.getElementById("riskLitresVal").textContent = Math.round(litres).toLocaleString(locale) + " L";
+    document.getElementById("riskKzVal").textContent = "Kz " + (kz / 1e6).toLocaleString(locale, { maximumFractionDigits: 1 }) + " M";
   }
 
   function renderPriority() {
@@ -1046,11 +1097,9 @@
     document.getElementById("sourcesLine").innerHTML = t("sourcesLine");
     document.getElementById("simText").innerHTML = t("simText");
     document.getElementById("pitchP1").textContent = t("pitchP1");
-    document.getElementById("pitchP2").textContent = t("pitchP2");
-    document.getElementById("pitchLi1").innerHTML = t("pitchLi1");
-    document.getElementById("pitchLi2").innerHTML = t("pitchLi2");
-    document.getElementById("pitchLi3").innerHTML = t("pitchLi3");
-    document.getElementById("pitchLi4").innerHTML = t("pitchLi4");
+    ["pitchLi1", "pitchLi2", "pitchLi3", "pitchLi4", "pitchLi5", "pitchLi6"].forEach(function (id) {
+      document.getElementById(id).innerHTML = t(id);
+    });
     document.getElementById("signoffCred").textContent = t("signoffCred");
     document.getElementById("disclaimer").innerHTML = t("disclaimer");
     document.documentElement.lang = currentLang;
