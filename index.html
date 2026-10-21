@@ -183,6 +183,31 @@
   .lang-btn[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
   .lang-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
+  /* ---------- Document links ---------- */
+  .doc-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .doc-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+    padding: 6px 11px; border-radius: 7px; text-decoration: none;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-primary);
+  }
+  .doc-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+  .doc-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .doc-btn svg { width: 14px; height: 14px; flex: none; }
+  .doc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 8px; }
+  .doc-card {
+    display: flex; flex-direction: column; gap: 6px; padding: 16px;
+    border: 1px solid var(--border-strong); border-radius: 10px; background: var(--surface);
+    text-decoration: none; color: var(--text-primary);
+  }
+  .doc-card:hover { border-color: var(--accent); }
+  .doc-card__type { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text); font-weight: 700; }
+  .doc-card h4 { margin: 0; font-size: 1rem; }
+  .doc-card p { margin: 0; color: var(--text-secondary); font-size: 0.875rem; }
+  .doc-card__cta { margin-top: auto; padding-top: 6px; font-size: 0.85rem; font-weight: 600; color: var(--accent-text); }
+  @media (max-width: 640px) { .doc-links { justify-content: flex-start; } }
+
   /* ---------- Section labels ---------- */
   .section-label {
     display: flex;
@@ -565,6 +590,10 @@
         <button type="button" class="lang-btn" id="langPt" data-lang="pt">PT</button>
         <button type="button" class="lang-btn" id="langEn" data-lang="en">EN</button>
       </div>
+      <nav class="doc-links" aria-label="Documentos">
+        <a class="doc-btn" href="docs/Vigia_Arquitetura_Tecnica.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span data-i18n="docPdfBtn"></span></a>
+        <a class="doc-btn" href="docs/Vigia_Telemetria_Tanques.pptx" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span data-i18n="docPptBtn"></span></a>
+      </nav>
       <div>
         <div class="masthead__clock mono" id="clock">--:--:--</div>
         <div id="clockDate" class="dim">Luanda</div>
@@ -719,6 +748,21 @@
       <div class="faq-item"><h4 data-i18n="faq5Q"></h4><p data-i18n="faq5A"></p></div>
       <div class="faq-item"><h4 data-i18n="faq6Q"></h4><p data-i18n="faq6A"></p></div>
     </div>
+    <h3 class="faq-title" data-i18n="docsTitle"></h3>
+    <div class="doc-cards">
+      <a class="doc-card" href="docs/Vigia_Arquitetura_Tecnica.pdf" target="_blank" rel="noopener">
+        <span class="doc-card__type">PDF · 12 pp · PT</span>
+        <h4 data-i18n="docPdfTitle"></h4>
+        <p data-i18n="docPdfDesc"></p>
+        <span class="doc-card__cta" data-i18n="docOpen"></span>
+      </a>
+      <a class="doc-card" href="docs/Vigia_Telemetria_Tanques.pptx" download>
+        <span class="doc-card__type">PowerPoint · 18 slides · PT</span>
+        <h4 data-i18n="docPptTitle"></h4>
+        <p data-i18n="docPptDesc"></p>
+        <span class="doc-card__cta" data-i18n="docDownload"></span>
+      </a>
+    </div>
   </section>
 
   <section class="block pitch-panel">
@@ -774,6 +818,15 @@
   var i18n = {
     pt: {
       preparedFor: "Preparado para",
+      docPdfBtn: "PDF técnico",
+      docPptBtn: "Apresentação",
+      docsTitle: "Documentos",
+      docPdfTitle: "Arquitetura técnica",
+      docPdfDesc: "Do tanque ao telemóvel: sondas, gateway, rede celular, protocolos, segurança e piloto, com diagramas.",
+      docPptTitle: "Telemetria remota de tanques",
+      docPptDesc: "A mesma explicação em formato de apresentação, visual e com notas do orador.",
+      docOpen: "Abrir PDF →",
+      docDownload: "Descarregar PowerPoint ↓",
       eyebrow: "Sonangol Distribuidora · Versão de demonstração",
       subtitle: "Visibilidade em tempo real dos níveis de stock e do risco de rutura nos postos da Sonangol Distribuidora — uma demonstração do que a telemetria dos tanques pode fazer pela maior rede de combustíveis de Angola.",
       section1Title: "A Sonangol Distribuidora em números",
@@ -862,6 +915,15 @@
     },
     en: {
       preparedFor: "Prepared for",
+      docPdfBtn: "Technical PDF",
+      docPptBtn: "Presentation",
+      docsTitle: "Documents",
+      docPdfTitle: "Technical architecture",
+      docPdfDesc: "From tank to phone: probes, gateway, cellular network, protocols, security and pilot, with diagrams. (Portuguese)",
+      docPptTitle: "Remote tank telemetry",
+      docPptDesc: "The same explanation as a visual slide deck with speaker notes. (Portuguese)",
+      docOpen: "Open PDF →",
+      docDownload: "Download PowerPoint ↓",
       eyebrow: "Sonangol Distribuidora · Demonstration build",
       subtitle: "Live visibility into stock levels and stockout risk across Sonangol Distribuidora's stations — a demonstration of what tank telemetry can do for Angola's largest fuel network.",
       section1Title: "Sonangol Distribuidora by the numbers",
