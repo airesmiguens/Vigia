@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<title>Vigia — Arquitetura Técnica de Telemetria de Tanques</title>
+<style>
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  :root {
+    --ink: #10201C; --ink-2: #3E4B44; --muted: #7C877F; --line: #D5DAD5; --soft: #F1F3F0;
+    --accent: #4a3aa7; --accent-soft: #ECE9F8; --fuel: #F2B33D; --fuel-soft: #FBE7BC;
+    --water: #4F8FD6; --good: #0C8A0C; --warn: #B8790A; --crit: #C8302F; --navy: #1D2B4F;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: var(--ink);
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 10.2pt; line-height: 1.5; }
+  .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  h1 { font-size: 22pt; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.01em; }
+  h2 { font-size: 15pt; margin: 0 0 4px; color: var(--navy); }
+  h3 { font-size: 11.2pt; margin: 16px 0 6px; color: var(--navy); }
+  p { margin: 0 0 8px; }
+  ul, ol { margin: 0 0 8px; padding-left: 1.2em; }
+  li { margin-bottom: 3px; }
+  .page { page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  .kicker { font-family: "SF Mono", Menlo, monospace; font-size: 8pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .lead { font-size: 10.8pt; color: var(--ink-2); }
+  .section-head { border-bottom: 2px solid var(--navy); padding-bottom: 6px; margin-bottom: 12px; }
+  figure { margin: 10px 0 12px; break-inside: avoid; page-break-inside: avoid; }
+  figure svg { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  figure.compact svg { width: 80%; margin: 0 auto; }
+  figure.compact.tight svg { width: 70%; }
+  .callout.tight { margin: 6px 0; padding: 6px 10px; }
+  figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 5px; }
+  figcaption b { color: var(--ink-2); }
+  table { width: 100%; border-collapse: collapse; font-size: 8.8pt; margin: 6px 0 10px; break-inside: avoid; }
+  th { text-align: left; background: var(--soft); color: var(--ink-2); font-weight: 700; padding: 6px 7px; border-bottom: 1px solid var(--line); font-size: 8.2pt; text-transform: uppercase; letter-spacing: 0.03em; }
+  td { padding: 6px 7px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .callout { background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 9px 12px; border-radius: 4px; margin: 10px 0; font-size: 9.6pt; break-inside: avoid; }
+  .callout.warn { background: #FCF3E0; border-left-color: var(--warn); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  pre { background: #0F1A2E; color: #E6EAF2; font-family: "SF Mono", Menlo, monospace; font-size: 7.2pt; line-height: 1.35; padding: 8px 10px; border-radius: 6px; margin: 6px 0 10px; white-space: pre-wrap; break-inside: avoid; }
+  pre .c { color: #8FA3C0; }
+  .tag { display: inline-block; font-family: "SF Mono", Menlo, monospace; font-size: 7.6pt; padding: 1px 6px; border-radius: 3px; background: var(--soft); border: 1px solid var(--line); }
+  .small { font-size: 8.6pt; color: var(--ink-2); }
+  .refs li { font-size: 8.4pt; margin-bottom: 4px; word-break: break-all; }
+  /* cover */
+  .cover { height: 260mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .cover__brand { font-family: "SF Mono", Menlo, monospace; font-size: 40pt; font-weight: 700; color: var(--navy); letter-spacing: 0.02em; }
+  .cover__rule { height: 4px; width: 80px; background: var(--accent); margin: 18px 0; }
+  .cover__meta { font-size: 9.6pt; color: var(--ink-2); line-height: 1.7; }
+  .toc { list-style: none; padding: 0; margin: 0; }
+  .toc li { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px dotted var(--line); font-size: 10pt; }
+  .toc .n { font-family: "SF Mono", Menlo, monospace; color: var(--accent); width: 26px; }
+</style>
+</head>
+<body>
+
+<!-- ================= CAPA ================= -->
+<section class="page cover">
+  <div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px">
+      <span class="kicker" style="margin:0;color:#7C877F">Preparado para</span>
+      <img src="../assets/sonangol_dark.png" alt="Sonangol" style="height:15mm;width:auto;display:block">
+    </div>
+    <div class="kicker">Documento técnico · Versão 1.0 · Outubro 2026</div>
+    <div class="cover__brand">VIGIA</div>
+    <div class="cover__rule"></div>
+    <h1>Telemetria remota de tanques de combustível<br>para a rede Sonangol Distribuidora</h1>
+    <p class="lead" style="max-width:135mm">Arquitetura técnica, topologia de rede, engenharia de campo e exemplos práticos — da sonda dentro do tanque ao painel no computador e no telemóvel.</p>
+  </div>
+
+  <figure style="margin:0">
+    <svg viewBox="0 0 680 150" xmlns="http://www.w3.org/2000/svg" style="border:none">
+      <g font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#10201C">
+        <!-- tank -->
+        <rect x="10" y="55" width="100" height="56" rx="26" fill="#FBE7BC" stroke="#1D2B4F" stroke-width="1.5"/>
+        <rect x="11" y="80" width="98" height="30" rx="14" fill="#F2B33D" opacity="0.85"/>
+        <line x1="60" y1="40" x2="60" y2="108" stroke="#1D2B4F" stroke-width="2"/>
+        <text x="60" y="132" text-anchor="middle">Tanque</text>
+        <!-- console -->
+        <rect x="150" y="55" width="80" height="56" rx="5" fill="#fff" stroke="#1D2B4F" stroke-width="1.5"/>
+        <rect x="160" y="64" width="60" height="22" rx="2" fill="#ECE9F8"/>
+        <text x="190" y="132" text-anchor="middle">Consola ATG</text>
+        <!-- gateway -->
+        <rect x="270" y="65" width="80" height="40" rx="5" fill="#1D2B4F"/>
+        <line x1="335" y1="65" x2="335" y2="40" stroke="#1D2B4F" stroke-width="2"/>
+        <circle cx="335" cy="38" r="3" fill="#1D2B4F"/>
+        <text x="310" y="132" text-anchor="middle">Gateway 4G</text>
+        <!-- tower -->
+        <path d="M420 110 L432 45 L444 110 Z M426 85 L438 85 M423 100 L441 100" fill="none" stroke="#1D2B4F" stroke-width="1.5"/>
+        <path d="M418 40 a16 16 0 0 1 28 0 M412 33 a24 24 0 0 1 40 0" fill="none" stroke="#4a3aa7" stroke-width="1.5"/>
+        <text x="432" y="132" text-anchor="middle">Rede móvel</text>
+        <!-- server -->
+        <rect x="490" y="50" width="70" height="66" rx="5" fill="#fff" stroke="#1D2B4F" stroke-width="1.5"/>
+        <line x1="498" y1="66" x2="552" y2="66" stroke="#D5DAD5" stroke-width="6"/>
+        <line x1="498" y1="82" x2="552" y2="82" stroke="#D5DAD5" stroke-width="6"/>
+        <line x1="498" y1="98" x2="552" y2="98" stroke="#ECE9F8" stroke-width="6"/>
+        <text x="525" y="132" text-anchor="middle">Vigia</text>
+        <!-- phone & laptop -->
+        <rect x="598" y="48" width="34" height="62" rx="6" fill="#fff" stroke="#1D2B4F" stroke-width="1.5"/>
+        <rect x="604" y="58" width="22" height="10" rx="2" fill="#C8302F"/>
+        <rect x="640" y="62" width="34" height="28" rx="2" fill="#fff" stroke="#1D2B4F" stroke-width="1.5"/>
+        <rect x="634" y="92" width="46" height="5" rx="2" fill="#1D2B4F"/>
+        <text x="637" y="132" text-anchor="middle">Utilizadores</text>
+        <!-- arrows -->
+        <g stroke="#4a3aa7" stroke-width="1.6" fill="#4a3aa7">
+          <line x1="112" y1="83" x2="144" y2="83"/><path d="M148 83 l-7 -4 v8 z"/>
+          <line x1="232" y1="85" x2="264" y2="85"/><path d="M268 85 l-7 -4 v8 z"/>
+          <line x1="352" y1="85" x2="408" y2="85" stroke-dasharray="4 3"/><path d="M412 85 l-7 -4 v8 z"/>
+          <line x1="448" y1="83" x2="484" y2="83" stroke-dasharray="4 3"/><path d="M488 83 l-7 -4 v8 z"/>
+          <line x1="562" y1="80" x2="592" y2="80"/><path d="M596 80 l-7 -4 v8 z"/>
+        </g>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="cover__meta">
+    <b>Preparado para:</b> Sonangol Distribuidora — apresentação e discussão técnica<br>
+    <b>Autor:</b> Aires Augusto Miguêns · Cientista de Dados · airesmiguens@gmail.com · +244 931 391 063 · airestech.us<br>
+    <span class="small">Documento independente. Não é afiliado nem aprovado pela Sonangol e não foi preparado com dados da Sonangol. Marcas de equipamentos são citadas como exemplos de mercado, não como recomendação final de fornecedor. Valores de custo são estimativas a confirmar com fornecedores.</span>
+  </div>
+</section>
+
+<!-- ================= RESUMO + ÍNDICE ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">Resumo executivo</div><h2>A pergunta: como monitorizar remotamente qualquer posto?</h2></div>
+  <p class="lead">A resposta curta: <b>não é preciso inventar nada</b>. A tecnologia existe, está madura e já é usada comercialmente em redes de postos em vários países, incluindo em África. O trabalho do Vigia é <b>ligar o que já existe</b> nos postos da Sonangol a uma plataforma central, e transformar as leituras em decisões de abastecimento.</p>
+
+  <h3>O sistema em quatro camadas</h3>
+  <table>
+    <tr><th style="width:22%">Camada</th><th style="width:38%">O que faz</th><th>Tecnologia</th></tr>
+    <tr><td><b>1 · Medição</b><br><span class="small">no tanque</span></td><td>Mede a altura do combustível, da água no fundo e a temperatura.</td><td>Sonda magnetostritiva já ligada a um medidor automático de tanque (ATG). Onde não existe: sonda ou radar certificados ATEX/IECEx.</td></tr>
+    <tr><td><b>2 · Recolha</b><br><span class="small">no escritório do posto</span></td><td>Lê o inventário da consola ATG a cada 5–15 min, só em modo de leitura, e guarda localmente.</td><td>Gateway industrial 4G com porta série RS-232/RS-485 ou Ethernet, bateria e memória local.</td></tr>
+    <tr><td><b>3 · Transmissão</b><br><span class="small">rede</span></td><td>Envia as leituras de forma cifrada para o servidor central.</td><td>Rede móvel 4G/3G (Unitel, Africell, Movicel), APN privada opcional; fibra ou VSAT como alternativa.</td></tr>
+    <tr><td><b>4 · Plataforma</b><br><span class="small">servidor + utilizadores</span></td><td>Converte em litros, deteta vendas, entregas e anomalias, prevê a rutura e alerta.</td><td>Servidor Vigia (Sonangol ou nuvem à escolha), painel web, app móvel, SMS/email.</td></tr>
+  </table>
+
+  <div class="callout"><b>Princípio de segurança:</b> o sistema <b>só lê</b> os níveis dos tanques. Não tem acesso às bombas, aos preços, ao sistema de caixa (POS) nem a pagamentos — e fica numa rede separada da rede da loja.</div>
+
+  <h3>Índice</h3>
+  <ul class="toc">
+    <li><span class="n">01</span>Isto já foi feito noutros lugares?</li>
+    <li><span class="n">02</span>Arquitetura geral — do tanque ao telemóvel</li>
+    <li><span class="n">03</span>Camada 1 · Medição no tanque (engenharia da sonda)</li>
+    <li><span class="n">04</span>Camada 2 · Topologia dentro do posto</li>
+    <li><span class="n">05</span>Camada 3 · Topologia da rede nacional e protocolos</li>
+    <li><span class="n">06</span>Camada 4 · Processamento de dados, com exemplos calculados</li>
+    <li><span class="n">07</span>Monitorização no computador e no telemóvel</li>
+    <li><span class="n">08</span>Segurança, fiabilidade e conformidade</li>
+    <li><span class="n">09</span>Piloto de 90 dias: plano, levantamento e custos estimados</li>
+    <li><span class="n">10</span>Perguntas para a Sonangol e referências</li>
+  </ul>
+</section>
+
+<!-- ================= 01 JÁ FOI FEITO ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">01</div><h2>Isto já foi feito noutros lugares?</h2></div>
+  <p><b>Sim.</b> A monitorização remota de tanques em postos de combustível é um mercado estabelecido. Os grandes fabricantes de medidores de tanque vendem plataformas na nuvem para redes de postos, e existem empresas africanas a instalar sistemas com transmissão 4G na África Ocidental e Austral.</p>
+
+  <table>
+    <tr><th style="width:24%">Solução / empresa</th><th style="width:20%">Onde</th><th>O que faz (segundo o fornecedor)</th></tr>
+    <tr><td><b>Insite360</b><br><span class="small">Gilbarco Veeder-Root</span></td><td>Global, incl. Brasil e Europa</td><td>Plataforma na nuvem que recolhe os dados dos medidores de tanque (ATG) de toda a rede de postos; permite aos gestores ver o inventário de combustível de toda a rede à distância.</td></tr>
+    <tr><td><b>TLS-450PLUS</b> com acesso remoto<br><span class="small">Veeder-Root</span></td><td>Global, incl. Médio Oriente e África</td><td>Consola de medição de tanques com acesso remoto aos dados (opção "Plus View").</td></tr>
+    <tr><td><b>AFTECH</b></td><td>Senegal, Guiné, Serra Leoa, Libéria, Côte d'Ivoire, Zâmbia, África do Sul</td><td>Medição automática de tanques com envio por LTE para plataforma na nuvem; alertas de nível baixo, descidas rápidas (possível fuga ou furto) e diferenças de reconciliação.</td></tr>
+    <tr><td><b>AdvaIoT</b></td><td>África</td><td>Plataforma de gestão de pista que integra medidores de tanque, controladores de bombas e POS.</td></tr>
+    <tr><td><b>Veridapt</b></td><td>Internacional</td><td>Inventário gerido pelo fornecedor: relatórios automáticos enviados de 3 em 3 horas ao fornecedor de combustível do local.</td></tr>
+    <tr><td><b>OTS Group</b></td><td>Reino Unido</td><td>Monitorização remota de mais de 300 tanques, com redução significativa de deslocações para medição.</td></tr>
+  </table>
+
+  <h3>O que isto prova — e o que não prova</h3>
+  <div class="two">
+    <div>
+      <p><b>Prova que:</b></p>
+      <ul>
+        <li>a tecnologia é madura e comercial, não experimental;</li>
+        <li>as consolas ATG foram feitas para serem lidas por sistemas externos — o protocolo série da Veeder-Root é suportado por conversores industriais de terceiros (ex.: MSA, Chipkin/FieldServer);</li>
+        <li>a transmissão por rede móvel funciona em mercados africanos com condições semelhantes às de Angola.</li>
+      </ul>
+    </div>
+    <div>
+      <p><b>Não encontrámos:</b></p>
+      <ul>
+        <li>um caso público de telemetria de tanques em toda a rede de um distribuidor em Angola;</li>
+        <li>números independentes (não do fornecedor) sobre os resultados em África.</li>
+      </ul>
+      <p class="small">Os resultados citados acima são afirmações dos próprios fornecedores. O piloto proposto (secção 09) serve precisamente para medir os resultados na rede da Sonangol.</p>
+    </div>
+  </div>
+
+  <div class="callout"><b>Porquê o Vigia, se já existem produtos?</b> As plataformas dos fabricantes funcionam melhor quando todos os postos usam a mesma marca de equipamento. Uma rede com várias gerações de equipamento — e postos sem medidor — precisa de uma camada que <b>junte todas as fontes</b>, que seja <b>controlada pela Sonangol</b>, adaptada à logística angolana (depósitos, rotas, camiões-cisterna) e com a previsão de rutura e o despacho feitos à medida.</div>
+</section>
+
+<!-- ================= 02 ARQUITETURA GERAL ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">02</div><h2>Arquitetura geral — do tanque ao telemóvel</h2></div>
+  <p>O diagrama mostra o percurso de uma leitura, desde a sonda dentro do tanque até ao alerta no telemóvel de um despachante. Cada leitura demora segundos a percorrer todo o caminho.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a3aa7"/></marker>
+        <marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7C877F"/></marker>
+      </defs>
+      <g font-family="Helvetica, Arial, sans-serif" fill="#10201C">
+        <!-- zone backgrounds -->
+        <rect x="10" y="10" width="300" height="250" rx="8" fill="#F1F3F0"/>
+        <text x="22" y="30" font-size="10" font-weight="700" fill="#1D2B4F" letter-spacing="1">POSTO DE ABASTECIMENTO</text>
+        <rect x="322" y="10" width="110" height="250" rx="8" fill="#F7F6FC"/>
+        <text x="334" y="30" font-size="10" font-weight="700" fill="#1D2B4F" letter-spacing="1">REDE</text>
+        <rect x="444" y="10" width="226" height="250" rx="8" fill="#ECE9F8"/>
+        <text x="456" y="30" font-size="10" font-weight="700" fill="#1D2B4F" letter-spacing="1">PLATAFORMA VIGIA</text>
+
+        <!-- tanks -->
+        <g>
+          <rect x="24" y="150" width="120" height="70" rx="32" fill="#FBE7BC" stroke="#1D2B4F" stroke-width="1.4"/>
+          <rect x="25" y="178" width="118" height="41" rx="20" fill="#F2B33D" opacity="0.85"/>
+          <rect x="25" y="212" width="118" height="7" rx="3" fill="#4F8FD6"/>
+          <line x1="84" y1="128" x2="84" y2="217" stroke="#1D2B4F" stroke-width="2.2"/>
+          <circle cx="84" cy="178" r="5" fill="#fff" stroke="#1D2B4F" stroke-width="1.5"/>
+          <text x="84" y="240" font-size="10.5" text-anchor="middle" font-weight="700">① Tanque + sonda</text>
+          <text x="84" y="253" font-size="9" text-anchor="middle" fill="#3E4B44">nível · água · temperatura</text>
+        </g>
+        <!-- console -->
+        <rect x="170" y="50" width="120" height="58" rx="5" fill="#fff" stroke="#1D2B4F" stroke-width="1.4"/>
+        <rect x="180" y="58" width="70" height="26" rx="2" fill="#ECE9F8"/>
+        <text x="186" y="75" font-size="9" class="mono" fill="#4a3aa7">T1 62% T2 18%</text>
+        <circle cx="270" cy="70" r="4" fill="#0C8A0C"/>
+        <text x="230" y="100" font-size="9.5" text-anchor="middle">Consola ATG</text>
+        <path d="M84 128 L84 79 L168 79" fill="none" stroke="#1D2B4F" stroke-width="1.4" marker-end="url(#arg)"/>
+        <text x="92" y="74" font-size="8.5" fill="#3E4B44">cabo da sonda</text>
+        <!-- gateway -->
+        <rect x="170" y="150" width="120" height="50" rx="5" fill="#1D2B4F"/>
+        <text x="230" y="172" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">② Gateway 4G</text>
+        <text x="230" y="187" font-size="8.5" text-anchor="middle" fill="#C9D2E6">bateria · memória local</text>
+        <line x1="182" y1="150" x2="182" y2="128" stroke="#1D2B4F" stroke-width="2"/><circle cx="182" cy="126" r="3" fill="#1D2B4F"/>
+        <line x1="230" y1="110" x2="230" y2="146" stroke="#4a3aa7" stroke-width="1.6" marker-end="url(#ar)"/>
+        <text x="236" y="132" font-size="8.5" fill="#4a3aa7">RS-232 / Ethernet</text>
+        <text x="236" y="143" font-size="8.5" fill="#4a3aa7">só leitura</text>
+
+        <!-- network -->
+        <path d="M362 150 L377 70 L392 150 Z M368 120 L386 120 M365 136 L389 136" fill="none" stroke="#1D2B4F" stroke-width="1.4"/>
+        <path d="M361 66 a18 18 0 0 1 32 0 M354 58 a27 27 0 0 1 46 0" fill="none" stroke="#4a3aa7" stroke-width="1.4"/>
+        <text x="377" y="170" font-size="10" text-anchor="middle" font-weight="700">③ 4G / 3G</text>
+        <text x="377" y="183" font-size="8.5" text-anchor="middle" fill="#3E4B44">Unitel · Africell</text>
+        <text x="377" y="194" font-size="8.5" text-anchor="middle" fill="#3E4B44">Movicel</text>
+        <text x="377" y="214" font-size="8.5" text-anchor="middle" fill="#3E4B44">alternativa:</text>
+        <text x="377" y="225" font-size="8.5" text-anchor="middle" fill="#3E4B44">fibra · VSAT</text>
+        <path d="M292 175 C 320 175, 330 140, 356 128" fill="none" stroke="#4a3aa7" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#ar)"/>
+        <text x="300" y="214" font-size="8.5" fill="#4a3aa7">MQTT/TLS</text>
+
+        <!-- platform -->
+        <g font-size="9.5">
+          <rect x="456" y="44" width="202" height="26" rx="4" fill="#fff" stroke="#4a3aa7"/><text x="466" y="61">Receção segura (broker MQTT)</text>
+          <rect x="456" y="76" width="202" height="26" rx="4" fill="#fff" stroke="#4a3aa7"/><text x="466" y="93">Validação + conversão em litros</text>
+          <rect x="456" y="108" width="202" height="26" rx="4" fill="#fff" stroke="#4a3aa7"/><text x="466" y="125">Base de dados de séries temporais</text>
+          <rect x="456" y="140" width="202" height="26" rx="4" fill="#fff" stroke="#4a3aa7"/><text x="466" y="157">Eventos: vendas · entregas · anomalias</text>
+          <rect x="456" y="172" width="202" height="26" rx="4" fill="#fff" stroke="#4a3aa7"/><text x="466" y="189">Previsão de rutura + fila de despacho</text>
+          <rect x="456" y="204" width="202" height="26" rx="4" fill="#4a3aa7"/><text x="466" y="221" fill="#fff" font-weight="700">API · Alertas · Painel</text>
+        </g>
+        <text x="557" y="250" font-size="10" text-anchor="middle" font-weight="700">④ Servidor Vigia</text>
+        <path d="M398 105 C 420 90, 430 60, 452 57" fill="none" stroke="#4a3aa7" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#ar)"/>
+
+        <!-- users -->
+        <text x="22" y="290" font-size="10" font-weight="700" fill="#1D2B4F" letter-spacing="1">QUEM VÊ OS DADOS</text>
+        <line x1="557" y1="256" x2="557" y2="300" stroke="#4a3aa7" stroke-width="1.6"/>
+        <line x1="90" y1="300" x2="610" y2="300" stroke="#4a3aa7" stroke-width="1.6"/>
+        <g font-size="9.5">
+          <!-- laptop sede -->
+          <line x1="90" y1="300" x2="90" y2="318" stroke="#4a3aa7" stroke-width="1.6" marker-end="url(#ar)"/>
+          <rect x="52" y="322" width="76" height="48" rx="3" fill="#fff" stroke="#1D2B4F" stroke-width="1.4"/>
+          <rect x="58" y="328" width="30" height="12" fill="#ECE9F8"/><rect x="92" y="328" width="30" height="12" fill="#FBE7BC"/>
+          <rect x="58" y="344" width="64" height="20" fill="#F1F3F0"/>
+          <rect x="44" y="372" width="92" height="5" rx="2" fill="#1D2B4F"/>
+          <text x="90" y="394" text-anchor="middle" font-weight="700">Sede / Operações</text>
+          <text x="90" y="407" text-anchor="middle" fill="#3E4B44" font-size="8.5">painel nacional</text>
+          <!-- dispatch -->
+          <line x1="225" y1="300" x2="225" y2="318" stroke="#4a3aa7" stroke-width="1.6" marker-end="url(#ar)"/>
+          <rect x="187" y="322" width="76" height="48" rx="3" fill="#fff" stroke="#1D2B4F" stroke-width="1.4"/>
+          <rect x="193" y="328" width="64" height="7" fill="#C8302F"/><rect x="193" y="338" width="64" height="7" fill="#B8790A"/><rect x="193" y="348" width="64" height="7" fill="#0C8A0C"/>
+          <rect x="179" y="372" width="92" height="5" rx="2" fill="#1D2B4F"/>
+          <text x="225" y="394" text-anchor="middle" font-weight="700">Despacho / Logística</text>
+          <text x="225" y="407" text-anchor="middle" fill="#3E4B44" font-size="8.5">fila de reabastecimento</text>
+          <!-- regional phone -->
+          <line x1="360" y1="300" x2="360" y2="318" stroke="#4a3aa7" stroke-width="1.6" marker-end="url(#ar)"/>
+          <rect x="344" y="320" width="32" height="58" rx="6" fill="#fff" stroke="#1D2B4F" stroke-width="1.4"/>
+          <rect x="349" y="330" width="22" height="9" rx="2" fill="#C8302F"/><rect x="349" y="343" width="22" height="5" fill="#F1F3F0"/><rect x="349" y="351" width="22" height="5" fill="#F1F3F0"/>
+          <text x="360" y="394" text-anchor="middle" font-weight="700">Gestor regional</text>
+          <text x="360" y="407" text-anchor="middle" fill="#3E4B44" font-size="8.5">app móvel</text>
+          <!-- station manager -->
+          <line x1="480" y1="300" x2="480" y2="318" stroke="#4a3aa7" stroke-width="1.6" marker-end="url(#ar)"/>
+          <rect x="464" y="320" width="32" height="58" rx="6" fill="#fff" stroke="#1D2B4F" stroke-width="1.4"/>
+          <rect x="469" y="330" width="22" height="20" rx="2" fill="#FBE7BC"/>
+          <text x="480" y="394" text-anchor="middle" font-weight="700">Gerente do posto</text>
+          <text x="480" y="407" text-anchor="middle" fill="#3E4B44" font-size="8.5">app / SMS</text>
+          <!-- truck driver -->
+          <line x1="610" y1="300" x2="610" y2="318" stroke="#4a3aa7" stroke-width="1.6" marker-end="url(#ar)"/>
+          <rect x="574" y="334" width="50" height="28" rx="3" fill="#F2B33D" stroke="#1D2B4F" stroke-width="1.2"/>
+          <rect x="624" y="342" width="20" height="20" rx="3" fill="#1D2B4F"/>
+          <circle cx="588" cy="366" r="5" fill="#1D2B4F"/><circle cx="634" cy="366" r="5" fill="#1D2B4F"/>
+          <text x="610" y="394" text-anchor="middle" font-weight="700">Motorista</text>
+          <text x="610" y="407" text-anchor="middle" fill="#3E4B44" font-size="8.5">ordem de entrega</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption><b>Figura 1 — Arquitetura ponta a ponta.</b> Linha contínua: ligação física local. Linha tracejada: transmissão cifrada por rede pública. A seta entre consola e gateway é de sentido único: o gateway só pede leituras.</figcaption>
+  </figure>
+
+  <h3>O percurso de uma leitura, passo a passo</h3>
+  <ol>
+    <li>A <b>sonda</b> dentro do tanque mede continuamente a altura do combustível, da água e a temperatura.</li>
+    <li>A <b>consola ATG</b> no escritório converte as medições em volume, usando a tabela de arqueação do tanque.</li>
+    <li>A cada 10 minutos, o <b>gateway</b> pede à consola o relatório de inventário pela porta série e recebe a resposta.</li>
+    <li>O gateway empacota a leitura (≈ 1 KB), assina-a com o seu certificado e envia-a por <b>4G</b>. Se não houver rede, guarda-a e envia mais tarde.</li>
+    <li>O <b>servidor Vigia</b> valida, guarda, recalcula o consumo e a previsão de rutura — e, se o tanque entrar em zona crítica, gera um <b>alerta</b>.</li>
+    <li>O alerta aparece no <b>painel de despacho</b> e no <b>telemóvel</b> do gestor regional, com a ação recomendada.</li>
+  </ol>
+</section>
+
+<!-- ================= 03 CAMADA 1 ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">03 · Camada 1</div><h2>Medição no tanque — a engenharia da sonda</h2></div>
+  <p>Os postos modernos guardam o combustível em <b>tanques subterrâneos</b> (tipicamente 20 000 a 50 000 litros cada, um por produto). O instrumento padrão da indústria é a <b>sonda magnetostritiva</b>: uma haste vertical instalada pela boca de visita do tanque, com flutuadores que sobem e descem com os líquidos.</p>
+
+  <figure class="compact tight">
+    <svg viewBox="0 0 680 350" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="soil" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r="0.9" fill="#B9AE98"/><circle cx="7" cy="8" r="0.7" fill="#B9AE98"/></pattern>
+        <marker id="ld" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="5" markerHeight="5"><circle cx="3" cy="3" r="2.5" fill="#10201C"/></marker>
+      </defs>
+      <g font-family="Helvetica, Arial, sans-serif" fill="#10201C">
+        <!-- ground -->
+        <rect x="0" y="80" width="680" height="270" fill="#EFE9DC"/>
+        <rect x="0" y="80" width="680" height="270" fill="url(#soil)"/>
+        <rect x="0" y="66" width="470" height="14" fill="#C9CCCB"/>
+        <text x="12" y="60" font-size="9" fill="#3E4B44">pavimento da pista</text>
+        <!-- zone 1 -->
+        <rect x="222" y="28" width="116" height="104" fill="none" stroke="#C8302F" stroke-width="1.2" stroke-dasharray="4 3"/>
+        <text x="228" y="22" font-size="8.5" fill="#C8302F" font-weight="700">ZONA 1 (ATEX)</text>
+        <!-- manhole / sump -->
+        <rect x="250" y="56" width="60" height="70" fill="#D8DBD8" stroke="#1D2B4F" stroke-width="1.2"/>
+        <rect x="244" y="50" width="72" height="8" fill="#1D2B4F"/>
+        <text x="280" y="46" font-size="8.5" text-anchor="middle" fill="#1D2B4F">tampa</text>
+        <!-- tank -->
+        <rect x="60" y="126" width="440" height="190" rx="95" fill="#FFFFFF" stroke="#1D2B4F" stroke-width="2"/>
+        <clipPath id="tankclip"><rect x="61" y="127" width="438" height="188" rx="94"/></clipPath>
+        <g clip-path="url(#tankclip)">
+          <rect x="60" y="205" width="440" height="111" fill="#F2B33D" opacity="0.85"/>
+          <rect x="60" y="296" width="440" height="20" fill="#4F8FD6"/>
+          <line x1="60" y1="205" x2="500" y2="205" stroke="#B8790A" stroke-width="1.5"/>
+        </g>
+        <text x="110" y="170" font-size="9" fill="#7C877F">vapor</text>
+        <text x="110" y="250" font-size="10" font-weight="700" fill="#5A3E00">combustível</text>
+        <text x="150" y="310" font-size="9" font-weight="700" fill="#fff">água</text>
+        <text x="380" y="300" font-size="8.5" fill="#fff">ZONA 0</text>
+        <!-- probe -->
+        <rect x="276" y="60" width="8" height="12" fill="#1D2B4F"/>
+        <line x1="280" y1="72" x2="280" y2="312" stroke="#1D2B4F" stroke-width="3"/>
+        <!-- floats -->
+        <rect x="268" y="198" width="24" height="14" rx="7" fill="#fff" stroke="#1D2B4F" stroke-width="1.6"/>
+        <rect x="270" y="292" width="20" height="12" rx="6" fill="#DDEBFA" stroke="#1D2B4F" stroke-width="1.6"/>
+        <!-- temp sensors -->
+        <circle cx="280" cy="150" r="2.8" fill="#C8302F"/><circle cx="280" cy="230" r="2.8" fill="#C8302F"/><circle cx="280" cy="262" r="2.8" fill="#C8302F"/>
+        <!-- cable to office -->
+        <path d="M284 64 L330 64 L330 92 L560 92 L560 70" fill="none" stroke="#1D2B4F" stroke-width="1.6" stroke-dasharray="6 3"/>
+        <text x="420" y="108" font-size="8.5" fill="#3E4B44">cabo blindado em conduta (barreira intrínseca)</text>
+        <!-- office -->
+        <rect x="510" y="10" width="160" height="70" rx="5" fill="#F1F3F0" stroke="#1D2B4F" stroke-width="1.2"/>
+        <text x="520" y="26" font-size="8.5" font-weight="700" fill="#1D2B4F">ESCRITÓRIO (zona segura)</text>
+        <rect x="524" y="34" width="72" height="38" rx="3" fill="#fff" stroke="#1D2B4F"/>
+        <text x="560" y="57" font-size="8.5" text-anchor="middle">Consola ATG</text>
+        <rect x="606" y="40" width="52" height="26" rx="3" fill="#1D2B4F"/>
+        <text x="632" y="57" font-size="8" text-anchor="middle" fill="#fff">Gateway</text>
+        <!-- leader labels -->
+        <g font-size="9">
+          <line x1="294" y1="205" x2="530" y2="160" stroke="#10201C" stroke-width="0.8"/>
+          <text x="534" y="152" font-weight="700">A · Flutuador de produto</text>
+          <text x="534" y="164" fill="#3E4B44">segue a superfície do combustível</text>
+          <line x1="292" y1="298" x2="530" y2="250" stroke="#10201C" stroke-width="0.8"/>
+          <text x="534" y="242" font-weight="700">B · Flutuador de água</text>
+          <text x="534" y="254" fill="#3E4B44">mais denso: só flutua na água</text>
+          <line x1="284" y1="262" x2="530" y2="205" stroke="#10201C" stroke-width="0.8"/>
+          <text x="534" y="197" font-weight="700">C · Sensores de temperatura</text>
+          <text x="534" y="209" fill="#3E4B44">vários pontos ao longo da haste</text>
+          <line x1="280" y1="120" x2="530" y2="296" stroke="#10201C" stroke-width="0.8"/>
+          <text x="534" y="292" font-weight="700">D · Haste magnetostritiva</text>
+          <text x="534" y="304" fill="#3E4B44">mede a posição dos flutuadores</text>
+          <text x="534" y="316" fill="#3E4B44">por pulso elétrico + onda de torção</text>
+        </g>
+        <!-- dimension -->
+        <line x1="40" y1="205" x2="40" y2="316" stroke="#4a3aa7" stroke-width="1"/>
+        <line x1="34" y1="205" x2="46" y2="205" stroke="#4a3aa7"/><line x1="34" y1="316" x2="46" y2="316" stroke="#4a3aa7"/>
+        <text x="30" y="264" font-size="8.5" fill="#4a3aa7" transform="rotate(-90 30 264)" text-anchor="middle">altura do produto</text>
+        <text x="12" y="340" font-size="8.5" fill="#3E4B44">Corte esquemático, fora de escala.</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 2 — Corte de um tanque subterrâneo com sonda magnetostritiva.</b> O interior do tanque é Zona 0 (atmosfera explosiva permanente); a câmara da boca de visita é Zona 1. Todo o equipamento nestas zonas tem de ser certificado e ligado através de barreira de segurança intrínseca.</figcaption>
+  </figure>
+
+  <h3>Como funciona a sonda (em termos simples)</h3>
+  <p>A consola envia um pulso elétrico pelo fio dentro da haste. Cada flutuador tem um íman; quando o pulso passa pelo íman, cria uma pequena onda mecânica que volta ao topo da haste. O tempo que a onda demora a voltar indica <b>exatamente</b> a altura de cada flutuador — com precisão da ordem do milímetro. A consola converte a altura em litros com a <b>tabela de arqueação</b> do tanque e corrige o volume para a temperatura de referência de <b>15 °C</b>, porque o combustível dilata com o calor.</p>
+
+  <h3>Opções de medição, por tipo de posto</h3>
+  <table>
+    <tr><th>Tecnologia</th><th>Precisão</th><th>Quando usar</th><th>Notas de engenharia</th></tr>
+    <tr><td><b>Sonda magnetostritiva + ATG</b> (já existente)</td><td>Muito alta</td><td>Postos modernos e requalificados</td><td>Só é preciso ler a consola. Caso ideal: custo de hardware mínimo.</td></tr>
+    <tr><td><b>Sonda magnetostritiva nova</b></td><td>Muito alta</td><td>Postos sem ATG, com boca de visita disponível</td><td>Exige consola ou transmissor e instalação certificada ATEX/IECEx.</td></tr>
+    <tr><td><b>Radar sem contacto</b></td><td>Alta</td><td>Tanques onde não se pode instalar haste</td><td>Montado no topo, mede a superfície por micro-ondas; não mede água no fundo.</td></tr>
+    <tr><td><b>Ultrassónico</b></td><td>Média</td><td>Tanques de superfície, gasóleo de geradores</td><td>Pouco adequado a tanques de gasolina (vapores afetam o som); confirmar certificação.</td></tr>
+    <tr><td><b>Vareta manual + app</b></td><td>Baixa</td><td>Passo intermédio, sem hardware</td><td>O funcionário regista a leitura no telemóvel 2–3 vezes por dia.</td></tr>
+  </table>
+</section>
+
+<!-- ================= 04 CAMADA 2 ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">04 · Camada 2</div><h2>Topologia dentro do posto</h2></div>
+  <p>Dentro do posto, o Vigia acrescenta <b>um único equipamento</b>: o gateway, instalado no escritório ao lado da consola ATG. Fica numa rede própria, separada da rede da loja e do sistema de caixa.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a3aa7"/></marker></defs>
+      <g font-family="Helvetica, Arial, sans-serif" fill="#10201C" font-size="9.5">
+        <rect x="10" y="10" width="660" height="340" rx="8" fill="#FAFAF8" stroke="#1D2B4F" stroke-width="1.2"/>
+        <text x="22" y="30" font-size="10" font-weight="700" fill="#1D2B4F" letter-spacing="1">POSTO SONANGOL (EXEMPLO)</text>
+
+        <!-- canopy / forecourt -->
+        <rect x="24" y="44" width="300" height="150" rx="6" fill="#F1F3F0"/>
+        <text x="34" y="62" font-size="9" font-weight="700" fill="#3E4B44">PISTA (zona classificada)</text>
+        <g>
+          <rect x="54" y="80" width="40" height="64" rx="4" fill="#fff" stroke="#1D2B4F"/><rect x="60" y="88" width="28" height="14" fill="#ECE9F8"/>
+          <text x="74" y="160" text-anchor="middle" font-size="8.5">Bomba 1</text>
+          <rect x="124" y="80" width="40" height="64" rx="4" fill="#fff" stroke="#1D2B4F"/><rect x="130" y="88" width="28" height="14" fill="#ECE9F8"/>
+          <text x="144" y="160" text-anchor="middle" font-size="8.5">Bomba 2</text>
+          <rect x="194" y="80" width="40" height="64" rx="4" fill="#fff" stroke="#1D2B4F"/><rect x="200" y="88" width="28" height="14" fill="#ECE9F8"/>
+          <text x="214" y="160" text-anchor="middle" font-size="8.5">Bomba 3</text>
+        </g>
+        <!-- tanks underground -->
+        <rect x="24" y="206" width="300" height="130" rx="6" fill="#EFE9DC"/>
+        <text x="34" y="224" font-size="9" font-weight="700" fill="#6B5A3A">TANQUES SUBTERRÂNEOS</text>
+        <g>
+          <rect x="40" y="240" width="80" height="44" rx="20" fill="#FBE7BC" stroke="#1D2B4F"/><text x="72" y="300" text-anchor="middle" font-size="8.5">T1 Gasolina</text>
+          <rect x="134" y="240" width="80" height="44" rx="20" fill="#FBE7BC" stroke="#1D2B4F"/><text x="166" y="300" text-anchor="middle" font-size="8.5">T2 Gasóleo</text>
+          <rect x="228" y="240" width="80" height="44" rx="20" fill="#FBE7BC" stroke="#1D2B4F"/><text x="260" y="300" text-anchor="middle" font-size="8.5">T3 Gasóleo</text>
+          <line x1="104" y1="232" x2="104" y2="280" stroke="#1D2B4F" stroke-width="2"/>
+          <line x1="198" y1="232" x2="198" y2="280" stroke="#1D2B4F" stroke-width="2"/>
+          <line x1="292" y1="232" x2="292" y2="280" stroke="#1D2B4F" stroke-width="2"/>
+        </g>
+        <path d="M104 232 L104 232 M104 280 L104 316 L360 316 L360 150 L382 150" fill="none" stroke="#1D2B4F" stroke-width="1.4" stroke-dasharray="6 3"/>
+        <path d="M198 280 L198 316" fill="none" stroke="#1D2B4F" stroke-width="1.4" stroke-dasharray="6 3"/>
+        <path d="M292 280 L292 316" fill="none" stroke="#1D2B4F" stroke-width="1.4" stroke-dasharray="6 3"/>
+        <text x="34" y="332" font-size="8.5" fill="#3E4B44">cabos das sondas (barreira intrínseca na consola)</text>
+
+        <!-- office -->
+        <rect x="372" y="44" width="286" height="292" rx="6" fill="#fff" stroke="#1D2B4F" stroke-width="1.2"/>
+        <text x="384" y="62" font-size="9" font-weight="700" fill="#3E4B44">ESCRITÓRIO / LOJA (zona segura)</text>
+
+        <!-- isolated monitoring network -->
+        <rect x="382" y="74" width="266" height="164" rx="5" fill="#ECE9F8" stroke="#4a3aa7" stroke-dasharray="4 3"/>
+        <text x="392" y="90" font-size="8.5" font-weight="700" fill="#4a3aa7">REDE DE MONITORIZAÇÃO (isolada)</text>
+        <rect x="392" y="126" width="100" height="48" rx="4" fill="#fff" stroke="#1D2B4F" stroke-width="1.3"/>
+        <text x="442" y="146" text-anchor="middle" font-weight="700">Consola ATG</text>
+        <text x="442" y="160" text-anchor="middle" font-size="8.5" fill="#3E4B44">ex.: TLS-350/450</text>
+        <rect x="530" y="126" width="106" height="48" rx="4" fill="#1D2B4F"/>
+        <text x="583" y="146" text-anchor="middle" fill="#fff" font-weight="700">Gateway 4G</text>
+        <text x="583" y="160" text-anchor="middle" fill="#C9D2E6" font-size="8.5">dual-SIM · VPN/TLS</text>
+        <line x1="494" y1="150" x2="526" y2="150" stroke="#4a3aa7" stroke-width="1.8" marker-end="url(#a2)"/>
+        <text x="510" y="142" text-anchor="middle" font-size="8" fill="#4a3aa7">RS-232</text>
+        <rect x="530" y="190" width="106" height="36" rx="4" fill="#fff" stroke="#1D2B4F"/>
+        <text x="583" y="206" text-anchor="middle" font-weight="700" font-size="9">UPS / bateria</text>
+        <text x="583" y="219" text-anchor="middle" font-size="8" fill="#3E4B44">autonomia 8–24 h</text>
+        <line x1="583" y1="176" x2="583" y2="188" stroke="#1D2B4F" stroke-width="1.2"/>
+        <!-- antenna -->
+        <line x1="620" y1="126" x2="620" y2="40" stroke="#1D2B4F" stroke-width="1.6"/>
+        <path d="M610 40 l10 -18 l10 18 z" fill="#1D2B4F"/>
+        <text x="606" y="36" font-size="8.5" fill="#1D2B4F" text-anchor="end">antena externa no telhado</text>
+        <path d="M636 22 a12 12 0 0 1 20 0 M632 15 a18 18 0 0 1 28 0" fill="none" stroke="#4a3aa7" stroke-width="1.3"/>
+
+        <!-- POS network separate -->
+        <rect x="382" y="254" width="266" height="70" rx="5" fill="#F7F7F5" stroke="#B5BBB5"/>
+        <text x="392" y="270" font-size="8.5" font-weight="700" fill="#7C877F">REDE DA LOJA (não tocada pelo Vigia)</text>
+        <rect x="392" y="280" width="76" height="34" rx="3" fill="#fff" stroke="#B5BBB5"/><text x="430" y="301" text-anchor="middle" font-size="8.5" fill="#7C877F">POS / caixa</text>
+        <rect x="478" y="280" width="76" height="34" rx="3" fill="#fff" stroke="#B5BBB5"/><text x="516" y="295" text-anchor="middle" font-size="8.5" fill="#7C877F">Controlador</text><text x="516" y="306" text-anchor="middle" font-size="8.5" fill="#7C877F">de bombas</text>
+        <rect x="564" y="280" width="76" height="34" rx="3" fill="#fff" stroke="#B5BBB5"/><text x="602" y="301" text-anchor="middle" font-size="8.5" fill="#7C877F">Router loja</text>
+        <line x1="442" y1="238" x2="442" y2="254" stroke="#C8302F" stroke-width="1.6"/>
+        <text x="448" y="250" font-size="8" fill="#C8302F" font-weight="700">✕ sem ligação</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 3 — Topologia física e lógica de um posto.</b> O gateway liga-se apenas à consola ATG. Numa fase 2 opcional, pode ler (sem controlar) as vendas do controlador de bombas para a reconciliação — sempre com aprovação da equipa de TI da Sonangol.</figcaption>
+  </figure>
+
+  <h3>Especificação do gateway</h3>
+  <table>
+    <tr><th style="width:30%">Requisito</th><th>Especificação mínima</th></tr>
+    <tr><td>Comunicação móvel</td><td>4G LTE com recuo para 3G/2G; <b>dois cartões SIM</b> de operadores diferentes (ex.: Unitel + Africell) com troca automática</td></tr>
+    <tr><td>Interfaces locais</td><td>RS-232 e/ou RS-485 (consola ATG), Ethernet (consolas com rede)</td></tr>
+    <tr><td>Memória local</td><td>Armazenamento de pelo menos 30 dias de leituras sem rede</td></tr>
+    <tr><td>Energia</td><td>Entrada 9–30 V DC, ligado a UPS ou bateria; reinício automático após corte (watchdog)</td></tr>
+    <tr><td>Ambiente</td><td>Gama industrial (−20 a +70 °C), caixa metálica, montagem em calha DIN</td></tr>
+    <tr><td>Segurança</td><td>TLS 1.2+, certificado único por equipamento, VPN opcional, atualização remota de firmware assinada</td></tr>
+    <tr><td>Exemplos de classe</td><td class="small">Routers/gateways industriais do tipo Teltonika RUT, Moxa, Advantech, ou gateways IoT dedicados. Escolha final após o levantamento.</td></tr>
+  </table>
+</section>
+
+<!-- ================= 05 CAMADA 3 ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">05 · Camada 3</div><h2>Topologia da rede nacional e protocolos</h2></div>
+  <p>Cada posto fala diretamente com a plataforma central, numa topologia em <b>estrela</b>. Não há dependência entre postos: se um posto perder a rede, os outros continuam a reportar normalmente.</p>
+
+  <figure class="compact tight">
+    <svg viewBox="0 0 680 350" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a3aa7"/></marker></defs>
+      <g font-family="Helvetica, Arial, sans-serif" fill="#10201C" font-size="9">
+        <text x="14" y="22" font-size="9.5" font-weight="700" fill="#1D2B4F" letter-spacing="1">POSTOS</text>
+        <g>
+          <rect x="14" y="34"  width="150" height="34" rx="4" fill="#fff" stroke="#1D2B4F"/><text x="24" y="50" font-weight="700">Talatona · Luanda</text><text x="24" y="62" fill="#3E4B44" font-size="8">4G Unitel + Africell</text>
+          <rect x="14" y="76"  width="150" height="34" rx="4" fill="#fff" stroke="#1D2B4F"/><text x="24" y="92" font-weight="700">Kilamba Kiaxi · Luanda</text><text x="24" y="104" fill="#3E4B44" font-size="8">4G Unitel + Movicel</text>
+          <rect x="14" y="118" width="150" height="34" rx="4" fill="#fff" stroke="#1D2B4F"/><text x="24" y="134" font-weight="700">Viana · Luanda</text><text x="24" y="146" fill="#3E4B44" font-size="8">Fibra do posto + 4G reserva</text>
+          <rect x="14" y="160" width="150" height="34" rx="4" fill="#fff" stroke="#1D2B4F"/><text x="24" y="176" font-weight="700">Lobito · Benguela</text><text x="24" y="188" fill="#3E4B44" font-size="8">4G Africell + Unitel</text>
+          <rect x="14" y="202" width="150" height="34" rx="4" fill="#fff" stroke="#1D2B4F"/><text x="24" y="218" font-weight="700">Cacongo · Cabinda</text><text x="24" y="230" fill="#3E4B44" font-size="8">3G + antena externa</text>
+          <rect x="14" y="244" width="150" height="34" rx="4" fill="#fff" stroke="#1D2B4F"/><text x="24" y="260" font-weight="700">Posto rural (EN)</text><text x="24" y="272" fill="#3E4B44" font-size="8">VSAT (sem cobertura móvel)</text>
+          <text x="89" y="298" text-anchor="middle" fill="#3E4B44">… até 326 postos</text>
+        </g>
+        <!-- operators -->
+        <g>
+          <ellipse cx="250" cy="80" rx="52" ry="24" fill="#F7F6FC" stroke="#4a3aa7"/><text x="250" y="84" text-anchor="middle" font-weight="700">Unitel</text>
+          <ellipse cx="250" cy="142" rx="52" ry="24" fill="#F7F6FC" stroke="#4a3aa7"/><text x="250" y="146" text-anchor="middle" font-weight="700">Africell</text>
+          <ellipse cx="250" cy="204" rx="52" ry="24" fill="#F7F6FC" stroke="#4a3aa7"/><text x="250" y="208" text-anchor="middle" font-weight="700">Movicel</text>
+          <ellipse cx="250" cy="266" rx="52" ry="24" fill="#F7F6FC" stroke="#4a3aa7"/><text x="250" y="270" text-anchor="middle" font-weight="700">Satélite</text>
+        </g>
+        <g stroke="#4a3aa7" stroke-width="1.1" fill="none" opacity="0.8">
+          <line x1="164" y1="51" x2="198" y2="78"/><line x1="164" y1="55" x2="198" y2="138"/>
+          <line x1="164" y1="93" x2="198" y2="84"/><line x1="164" y1="97" x2="198" y2="200"/>
+          <line x1="164" y1="135" x2="198" y2="142" stroke-dasharray="3 2"/>
+          <line x1="164" y1="177" x2="198" y2="146"/><line x1="164" y1="181" x2="198" y2="88"/>
+          <line x1="164" y1="219" x2="198" y2="92"/>
+          <line x1="164" y1="261" x2="198" y2="266"/>
+        </g>
+        <!-- private APN / internet -->
+        <rect x="330" y="120" width="100" height="70" rx="35" fill="#fff" stroke="#1D2B4F" stroke-width="1.3"/>
+        <text x="380" y="148" text-anchor="middle" font-weight="700">APN privada</text>
+        <text x="380" y="161" text-anchor="middle">ou Internet</text>
+        <text x="380" y="174" text-anchor="middle" fill="#4a3aa7">túnel cifrado</text>
+        <g stroke="#4a3aa7" stroke-width="1.4" fill="none">
+          <path d="M302 80 C 320 90, 325 120, 334 136" marker-end="url(#a3)"/>
+          <path d="M302 142 L 328 150" marker-end="url(#a3)"/>
+          <path d="M302 204 C 320 196, 325 180, 334 172" marker-end="url(#a3)"/>
+          <path d="M302 266 C 330 250, 350 220, 366 192" marker-end="url(#a3)"/>
+        </g>
+        <!-- firewall -->
+        <rect x="452" y="128" width="22" height="54" fill="#C8302F"/>
+        <g stroke="#fff" stroke-width="1"><line x1="452" y1="142" x2="474" y2="142"/><line x1="452" y1="155" x2="474" y2="155"/><line x1="452" y1="168" x2="474" y2="168"/><line x1="463" y1="128" x2="463" y2="142"/><line x1="458" y1="142" x2="458" y2="155"/><line x1="468" y1="155" x2="468" y2="168"/></g>
+        <text x="463" y="198" text-anchor="middle" font-size="8.5" fill="#C8302F" font-weight="700">firewall</text>
+        <line x1="432" y1="155" x2="448" y2="155" stroke="#4a3aa7" stroke-width="1.4" marker-end="url(#a3)"/>
+        <!-- platform -->
+        <rect x="490" y="34" width="176" height="244" rx="7" fill="#ECE9F8" stroke="#4a3aa7"/>
+        <text x="502" y="52" font-size="9.5" font-weight="700" fill="#1D2B4F" letter-spacing="0.5">PLATAFORMA VIGIA</text>
+        <text x="502" y="64" font-size="8" fill="#3E4B44">Datacenter Sonangol ou nuvem</text>
+        <g font-size="8.8">
+          <rect x="500" y="74" width="156" height="24" rx="3" fill="#fff" stroke="#4a3aa7"/><text x="508" y="90">Broker MQTT (porta 8883)</text>
+          <rect x="500" y="104" width="156" height="24" rx="3" fill="#fff" stroke="#4a3aa7"/><text x="508" y="120">Serviço de ingestão</text>
+          <rect x="500" y="134" width="156" height="24" rx="3" fill="#fff" stroke="#4a3aa7"/><text x="508" y="150">BD de séries temporais</text>
+          <rect x="500" y="164" width="156" height="24" rx="3" fill="#fff" stroke="#4a3aa7"/><text x="508" y="180">Motor de previsão</text>
+          <rect x="500" y="194" width="156" height="24" rx="3" fill="#fff" stroke="#4a3aa7"/><text x="508" y="210">Gestão de equipamentos</text>
+          <rect x="500" y="224" width="156" height="24" rx="3" fill="#4a3aa7"/><text x="508" y="240" fill="#fff" font-weight="700">API · Web · App · SMS</text>
+        </g>
+        <line x1="476" y1="155" x2="496" y2="86" stroke="#4a3aa7" stroke-width="1.4" marker-end="url(#a3)"/>
+        <!-- integration -->
+        <rect x="490" y="296" width="176" height="40" rx="5" fill="#fff" stroke="#1D2B4F" stroke-dasharray="4 3"/>
+        <text x="578" y="313" text-anchor="middle" font-weight="700">Sistemas Sonangol</text>
+        <text x="578" y="326" text-anchor="middle" font-size="8" fill="#3E4B44">ERP · logística · frota (fase 2)</text>
+        <line x1="578" y1="280" x2="578" y2="294" stroke="#1D2B4F" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <!-- legend -->
+        <text x="200" y="320" font-size="8.5" fill="#3E4B44">Linha contínua: ligação principal · tracejada: reserva automática</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 4 — Topologia nacional em estrela.</b> Cada posto tem dois caminhos de comunicação (dois operadores, ou fibra + 4G). Com uma <b>APN privada</b> contratada ao operador, os gateways nem sequer ficam visíveis na Internet pública.</figcaption>
+  </figure>
+
+  <h3>Os protocolos, camada a camada</h3>
+  <table>
+    <tr><th style="width:24%">Troço</th><th style="width:28%">Protocolo</th><th>Detalhe</th></tr>
+    <tr><td>Sonda → Consola</td><td>Proprietário do fabricante</td><td>Interno ao equipamento existente — o Vigia não lhe toca.</td></tr>
+    <tr><td>Consola → Gateway</td><td>Interface série Veeder-Root (RS-232, 9600 baud típico) ou TCP/IP</td><td>Padrão de facto do setor, também emulado por muitas consolas de outras marcas. O gateway envia o comando <span class="tag">i201</span> — <i>In-Tank Inventory Report</i> — e recebe o inventário de todos os tanques.</td></tr>
+    <tr><td>Gateway → Plataforma</td><td>MQTT sobre TLS 1.2+ (porta 8883)</td><td>Protocolo leve, desenhado para redes móveis instáveis; confirmação de entrega (QoS 1); reenvio automático.</td></tr>
+    <tr><td>Plataforma → Utilizadores</td><td>HTTPS, notificações push, SMS</td><td>Painel web, app móvel, SMS para alertas críticos (funciona mesmo sem dados móveis).</td></tr>
+  </table>
+
+  <div class="two">
+    <div>
+      <p class="small"><b>Exemplo — pedido e resposta da consola</b> (formato simplificado, ilustrativo):</p>
+<pre><span class="c">// gateway → consola (RS-232)</span>
+&lt;SOH&gt;i20100
+
+<span class="c">// consola → gateway</span>
+i20100 2610210940
+T1 GASOLINA  VOL 18 420  ALT 1 236mm
+             ÁGUA 6mm    TEMP 28.4°C
+T2 GASOLEO   VOL  5 110  ALT   498mm
+             ÁGUA 0mm    TEMP 29.1°C
+&lt;ETX&gt;</pre>
+    </div>
+    <div>
+      <p class="small"><b>Exemplo — mensagem enviada à plataforma</b> (JSON, ≈ 600 bytes):</p>
+<pre>{
+ "posto": "SD-LDA-0142",
+ "hora": "2026-10-21T09:40:00+01:00",
+ "tanques": [
+  { "id": "T2", "produto": "gasoleo",
+    "volume_l": 5110, "volume_15c_l": 5062,
+    "altura_mm": 498, "agua_mm": 0,
+    "temp_c": 29.1, "capacidade_l": 30000 }
+ ],
+ "gw": { "sinal_dbm": -79, "sim": "unitel",
+         "bateria": "rede" }
+}</pre>
+    </div>
+  </div>
+  <div class="callout tight"><b>Custo de dados:</b> 3 tanques × 1 leitura a cada 10 min = 144 mensagens/dia × ≈ 1 KB ≈ <b>4–5 MB por mês por posto</b>, incluindo sinalização. Um pacote de dados M2M básico é suficiente.</div>
+</section>
+
+<!-- ================= 06 CAMADA 4 ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">06 · Camada 4</div><h2>Processamento de dados — com exemplos calculados</h2></div>
+  <p>A plataforma não se limita a mostrar níveis. Cada leitura passa por uma cadeia de processamento que a transforma numa decisão.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 120" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4a3aa7"/></marker></defs>
+      <g font-family="Helvetica, Arial, sans-serif" font-size="8.8" fill="#10201C" text-anchor="middle">
+        <rect x="8"   y="30" width="84" height="54" rx="5" fill="#F1F3F0" stroke="#1D2B4F"/><text x="50" y="52" font-weight="700">Leitura</text><text x="50" y="66">bruta</text>
+        <rect x="104" y="30" width="84" height="54" rx="5" fill="#fff" stroke="#4a3aa7"/><text x="146" y="52" font-weight="700">Validação</text><text x="146" y="66">valores impossíveis,</text><text x="146" y="77">duplicados</text>
+        <rect x="200" y="30" width="84" height="54" rx="5" fill="#fff" stroke="#4a3aa7"/><text x="242" y="52" font-weight="700">Litros a 15 °C</text><text x="242" y="66">tabela de arqueação</text><text x="242" y="77">+ temperatura</text>
+        <rect x="296" y="30" width="84" height="54" rx="5" fill="#fff" stroke="#4a3aa7"/><text x="338" y="52" font-weight="700">Eventos</text><text x="338" y="66">venda · entrega ·</text><text x="338" y="77">anomalia</text>
+        <rect x="392" y="30" width="84" height="54" rx="5" fill="#fff" stroke="#4a3aa7"/><text x="434" y="52" font-weight="700">Previsão</text><text x="434" y="66">hora de rutura</text><text x="434" y="77">por tanque</text>
+        <rect x="488" y="30" width="84" height="54" rx="5" fill="#fff" stroke="#4a3aa7"/><text x="530" y="52" font-weight="700">Prioridade</text><text x="530" y="66">tempo de viagem</text><text x="530" y="77">do camião</text>
+        <rect x="584" y="30" width="88" height="54" rx="5" fill="#4a3aa7"/><text x="628" y="52" font-weight="700" fill="#fff">Alerta +</text><text x="628" y="66" fill="#fff">ação</text><text x="628" y="77" fill="#fff">recomendada</text>
+        <g stroke="#4a3aa7" stroke-width="1.5"><line x1="92" y1="57" x2="102" y2="57" marker-end="url(#a4)"/><line x1="188" y1="57" x2="198" y2="57" marker-end="url(#a4)"/><line x1="284" y1="57" x2="294" y2="57" marker-end="url(#a4)"/><line x1="380" y1="57" x2="390" y2="57" marker-end="url(#a4)"/><line x1="476" y1="57" x2="486" y2="57" marker-end="url(#a4)"/><line x1="572" y1="57" x2="582" y2="57" marker-end="url(#a4)"/></g>
+        <text x="340" y="108" fill="#3E4B44" font-size="8.5">Tempo total: segundos após a chegada da leitura</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 5 — Cadeia de processamento de cada leitura.</b></figcaption>
+  </figure>
+
+  <figure>
+    <svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="Helvetica, Arial, sans-serif" font-size="8.5" fill="#3E4B44">
+        <!-- axes: x 60..640 = 0..48h ; y 20..200 = 30000..0 L -->
+        <rect x="60" y="20" width="580" height="180" fill="#FAFAF8"/>
+        <rect x="60" y="173" width="580" height="27" fill="#FBE4E4"/>
+        <line x1="60" y1="173" x2="640" y2="173" stroke="#C8302F" stroke-dasharray="4 3"/>
+        <text x="66" y="188" fill="#C8302F" font-weight="700">nível crítico 15% (4 500 L)</text>
+        <g stroke="#E2E5E1"><line x1="60" y1="65" x2="640" y2="65"/><line x1="60" y1="110" x2="640" y2="110"/><line x1="60" y1="155" x2="640" y2="155"/></g>
+        <text x="54" y="24" text-anchor="end">30 000</text><text x="54" y="69" text-anchor="end">22 500</text><text x="54" y="114" text-anchor="end">15 000</text><text x="54" y="159" text-anchor="end">7 500</text><text x="54" y="203" text-anchor="end">0 L</text>
+        <g text-anchor="middle"><text x="60" y="216">ter 00h</text><text x="181" y="216">06h</text><text x="302" y="216">12h</text><text x="423" y="216">18h</text><text x="544" y="216">qua 00h</text><text x="640" y="216">05h</text></g>
+        <!-- history: night flat, day consumption, delivery at ~10h, then consumption -->
+        <polyline fill="none" stroke="#1D2B4F" stroke-width="2.2"
+          points="60,128 120,131 161,134 181,138 221,150 262,164 264,165 266,47 302,58 342,76 383,96 423,115 444,128"/>
+        <circle cx="444" cy="128" r="4" fill="#1D2B4F"/>
+        <text x="448" y="122" fill="#1D2B4F" font-weight="700">agora 19h: 12 100 L</text>
+        <!-- forecast -->
+        <polyline fill="none" stroke="#4a3aa7" stroke-width="2" stroke-dasharray="6 4" points="444,128 504,148 568,173 620,184"/>
+        <text x="560" y="140" fill="#4a3aa7" font-weight="700">previsão</text>
+        <circle cx="568" cy="173" r="4" fill="#C8302F"/>
+        <!-- delivery annotation -->
+        <line x1="264" y1="165" x2="264" y2="47" stroke="#0C8A0C" stroke-width="1"/>
+        <rect x="276" y="140" width="128" height="30" rx="3" fill="#E6F4E6"/>
+        <text x="282" y="153" fill="#0C8A0C" font-weight="700">entrega detetada 10h05</text>
+        <text x="282" y="165" fill="#0C8A0C">+19 700 L (fatura: 20 000 L)</text>
+        <!-- dispatch annotation -->
+        <rect x="470" y="40" width="166" height="44" rx="3" fill="#fff" stroke="#C8302F"/>
+        <text x="478" y="54" fill="#C8302F" font-weight="700">nível crítico previsto: qua 01h10</text>
+        <text x="478" y="67" fill="#10201C">camião a 3 h do depósito</text>
+        <text x="478" y="79" fill="#10201C" font-weight="700">→ despachar até ter 22h00</text>
+        <!-- night label -->
+        <text x="90" y="118" fill="#7C877F">noite: consumo baixo</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 6 — Exemplo de um tanque de gasóleo (30 000 L) ao longo de 30 horas.</b> Dados ilustrativos. A plataforma deteta a entrega automaticamente, confere o volume recebido com a fatura e calcula a hora de despacho a partir da previsão e do tempo de viagem.</figcaption>
+  </figure>
+
+  <h3>Três cálculos que a plataforma faz automaticamente</h3>
+  <table>
+    <tr><th style="width:22%">Cálculo</th><th style="width:48%">Exemplo</th><th>Resultado</th></tr>
+    <tr><td><b>Previsão de rutura</b></td><td>12 100 L agora; consumo previsto para as próximas horas ≈ 1 260 L/h ao fim da tarde, a cair durante a noite. O modelo aprende o padrão de cada posto por hora e dia da semana.</td><td>Nível crítico às <b>01h10</b>; camião precisa de 3 h → <b>despachar até às 22h00</b>.</td></tr>
+    <tr><td><b>Confirmação de entrega</b></td><td>Fatura: 20 000 L a 15 °C. Subida medida no tanque, corrigida para 15 °C: 19 700 L.</td><td>Diferença de <b>300 L (1,5%)</b> → acima da tolerância definida → alerta à logística.</td></tr>
+    <tr><td><b>Reconciliação diária</b></td><td>O tanque desceu 9 850 L no dia; as bombas registaram 9 610 L vendidos.</td><td>Diferença de <b>240 L (2,4%)</b> → acima do limite → investigar fuga, calibração ou desvio.</td></tr>
+  </table>
+  <p class="small">A reconciliação diária exige ler também as vendas das bombas (fase 2). As tolerâncias são definidas pela Sonangol.</p>
+</section>
+
+<!-- ================= 07 MONITORIZAÇÃO ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">07</div><h2>Monitorização no computador e no telemóvel</h2></div>
+  <p>Os mesmos dados chegam a pessoas diferentes, cada uma com a vista de que precisa. O acesso é por perfil: um gerente de posto só vê o seu posto; a sede vê a rede inteira.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="Helvetica, Arial, sans-serif" fill="#10201C">
+        <!-- desktop -->
+        <rect x="10" y="10" width="440" height="300" rx="8" fill="#fff" stroke="#1D2B4F" stroke-width="1.6"/>
+        <rect x="10" y="10" width="440" height="22" rx="8" fill="#1D2B4F"/>
+        <rect x="10" y="24" width="440" height="8" fill="#1D2B4F"/>
+        <circle cx="24" cy="21" r="3.5" fill="#C8302F"/><circle cx="36" cy="21" r="3.5" fill="#F2B33D"/><circle cx="48" cy="21" r="3.5" fill="#0C8A0C"/>
+        <rect x="120" y="15" width="220" height="12" rx="6" fill="#33416A"/><text x="230" y="24" font-size="7.5" fill="#C9D2E6" text-anchor="middle">vigia.sonangol.co.ao/despacho</text>
+        <text x="24" y="52" font-size="12" font-weight="700" font-family="Menlo, monospace">VIGIA</text>
+        <text x="80" y="52" font-size="9" fill="#3E4B44">Despacho · Província de Luanda</text>
+        <text x="436" y="52" font-size="8.5" fill="#3E4B44" text-anchor="end">ter 21 out · 19:02</text>
+        <!-- kpis -->
+        <g font-size="8">
+          <rect x="24" y="62" width="98" height="44" rx="4" fill="#FBE4E4"/><text x="32" y="82" font-size="15" font-weight="700" fill="#C8302F">3</text><text x="32" y="98" fill="#3E4B44">postos críticos</text>
+          <rect x="128" y="62" width="98" height="44" rx="4" fill="#FCF3E0"/><text x="136" y="82" font-size="15" font-weight="700" fill="#B8790A">11</text><text x="136" y="98" fill="#3E4B44">esgotam em 24 h</text>
+          <rect x="232" y="62" width="98" height="44" rx="4" fill="#ECE9F8"/><text x="240" y="82" font-size="15" font-weight="700" fill="#4a3aa7">7</text><text x="240" y="98" fill="#3E4B44">camiões em rota</text>
+          <rect x="336" y="62" width="100" height="44" rx="4" fill="#E6F4E6"/><text x="344" y="82" font-size="15" font-weight="700" fill="#0C8A0C">98%</text><text x="344" y="98" fill="#3E4B44">postos a reportar</text>
+        </g>
+        <!-- map placeholder -->
+        <rect x="24" y="114" width="200" height="182" rx="4" fill="#EEF2EE"/>
+        <path d="M40 140 C 80 120, 130 130, 160 150 S 210 200, 200 250 S 120 290, 70 270 S 30 200, 40 140 Z" fill="#E1E7E1" stroke="#C9D2C9"/>
+        <g><circle cx="90" cy="170" r="6" fill="#C8302F"/><circle cx="120" cy="200" r="6" fill="#0C8A0C"/><circle cx="150" cy="180" r="6" fill="#F2B33D"/><circle cx="100" cy="235" r="6" fill="#0C8A0C"/><circle cx="160" cy="240" r="6" fill="#C8302F"/><circle cx="130" cy="150" r="6" fill="#0C8A0C"/><circle cx="70" cy="215" r="6" fill="#F2B33D"/><circle cx="180" cy="210" r="6" fill="#0C8A0C"/><circle cx="140" cy="265" r="6" fill="#C8302F"/></g>
+        <text x="32" y="290" font-size="7.5" fill="#7C877F">mapa da rede (estado por cor)</text>
+        <!-- queue -->
+        <text x="236" y="126" font-size="9" font-weight="700">Fila de reabastecimento</text>
+        <g font-size="8">
+          <rect x="236" y="132" width="200" height="16" fill="#F1F3F0"/><text x="240" y="143" fill="#3E4B44">Posto</text><text x="330" y="143" fill="#3E4B44">Esgota</text><text x="380" y="143" fill="#3E4B44">Ação</text>
+          <text x="240" y="162">Viana · T2 gasóleo</text><text x="330" y="162" font-family="Menlo, monospace">~4h</text><rect x="376" y="153" width="58" height="13" rx="2" fill="#FBE4E4"/><text x="380" y="163" fill="#C8302F" font-weight="700" font-size="7">DESPACHAR</text>
+          <text x="240" y="182">Cazenga · T1 gasol.</text><text x="330" y="182" font-family="Menlo, monospace">~5h</text><rect x="376" y="173" width="58" height="13" rx="2" fill="#FBE4E4"/><text x="380" y="183" fill="#C8302F" font-weight="700" font-size="7">DESPACHAR</text>
+          <text x="240" y="202">Talatona · T3 gasóleo</text><text x="330" y="202" font-family="Menlo, monospace">~6h</text><rect x="376" y="193" width="58" height="13" rx="2" fill="#FBE4E4"/><text x="380" y="203" fill="#C8302F" font-weight="700" font-size="7">DESPACHAR</text>
+          <text x="240" y="222">Rangel · T1 gasol.</text><text x="330" y="222" font-family="Menlo, monospace">~10h</text><rect x="376" y="213" width="58" height="13" rx="2" fill="#FCF3E0"/><text x="380" y="223" fill="#B8790A" font-weight="700" font-size="7">AGENDAR</text>
+          <text x="240" y="242">Cacuaco · T2 gasóleo</text><text x="330" y="242" font-family="Menlo, monospace">~14h</text><rect x="376" y="233" width="58" height="13" rx="2" fill="#E6F4E6"/><text x="380" y="243" fill="#0C8A0C" font-weight="700" font-size="7">MONITORIZAR</text>
+          <line x1="236" y1="250" x2="436" y2="250" stroke="#E2E5E1"/>
+          <text x="236" y="266" font-size="8" fill="#3E4B44">Dados ilustrativos.</text>
+        </g>
+        <rect x="190" y="310" width="80" height="14" fill="#1D2B4F"/>
+        <rect x="150" y="324" width="160" height="6" rx="3" fill="#1D2B4F"/>
+        <text x="230" y="350" font-size="10" text-anchor="middle" font-weight="700">Computador — sede e despacho</text>
+        <text x="230" y="364" font-size="8.5" text-anchor="middle" fill="#3E4B44">mapa, fila de despacho, histórico, relatórios</text>
+
+        <!-- phone -->
+        <rect x="490" y="10" width="170" height="320" rx="22" fill="#1D2B4F"/>
+        <rect x="498" y="22" width="154" height="296" rx="15" fill="#F4F5F3"/>
+        <rect x="550" y="26" width="50" height="8" rx="4" fill="#1D2B4F"/>
+        <text x="506" y="50" font-size="8" fill="#3E4B44">19:02</text>
+        <!-- push notification -->
+        <rect x="504" y="58" width="142" height="68" rx="10" fill="#fff" stroke="#E2E5E1"/>
+        <rect x="512" y="66" width="14" height="14" rx="3" fill="#4a3aa7"/><text x="519" y="76" font-size="7" fill="#fff" text-anchor="middle" font-weight="700">V</text>
+        <text x="532" y="76" font-size="7.5" fill="#7C877F">VIGIA · agora</text>
+        <text x="512" y="94" font-size="9" font-weight="700" fill="#C8302F">CRÍTICO · Posto Viana</text>
+        <text x="512" y="107" font-size="8">T2 gasóleo 9% · esgota ~4h</text>
+        <text x="512" y="119" font-size="8" fill="#4a3aa7" font-weight="700">Ver e despachar →</text>
+        <!-- station detail -->
+        <text x="506" y="146" font-size="10" font-weight="700">Posto Viana</text>
+        <text x="506" y="158" font-size="7.5" fill="#7C877F">atualizado há 2 min · sinal bom</text>
+        <g>
+          <rect x="512" y="168" width="24" height="80" rx="12" fill="#E2E5E1"/><rect x="512" y="194" width="24" height="54" rx="12" fill="#0C8A0C"/>
+          <text x="524" y="262" font-size="7.5" text-anchor="middle">T1 67%</text>
+          <rect x="563" y="168" width="24" height="80" rx="12" fill="#E2E5E1"/><rect x="563" y="241" width="24" height="7" rx="3.5" fill="#C8302F"/>
+          <text x="575" y="262" font-size="7.5" text-anchor="middle" fill="#C8302F" font-weight="700">T2 9%</text>
+          <rect x="614" y="168" width="24" height="80" rx="12" fill="#E2E5E1"/><rect x="614" y="214" width="24" height="34" rx="12" fill="#F2B33D"/>
+          <text x="626" y="262" font-size="7.5" text-anchor="middle">T3 42%</text>
+        </g>
+        <rect x="506" y="276" width="138" height="26" rx="6" fill="#4a3aa7"/>
+        <text x="575" y="293" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">Confirmar despacho</text>
+        <text x="575" y="350" font-size="10" text-anchor="middle" font-weight="700">Telemóvel — gestor regional</text>
+        <text x="575" y="364" font-size="8.5" text-anchor="middle" fill="#3E4B44">alertas push, estado do posto, um toque</text>
+
+        <!-- sms -->
+        <rect x="10" y="374" width="660" height="22" rx="4" fill="#F1F3F0"/>
+        <text x="20" y="389" font-size="8.5" fill="#10201C"><tspan font-weight="700">SMS (sem internet):</tspan> <tspan font-family="Menlo, monospace">VIGIA CRITICO Viana T2 gasoleo 9% (~4h). Despacho recomendado ate 22:00. Resp 1=OK</tspan></text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 7 — Maquetas das vistas no computador e no telemóvel</b> (ilustrativas; o endereço web é um exemplo). O SMS garante que o alerta crítico chega mesmo a quem não tem dados móveis.</figcaption>
+  </figure>
+
+  <table>
+    <tr><th>Perfil</th><th>Onde</th><th>O que vê</th><th>Alertas</th></tr>
+    <tr><td>Sede / Direção de Operações</td><td>Computador</td><td>Rede nacional, indicadores, perdas, relatórios mensais</td><td>Resumo diário</td></tr>
+    <tr><td>Despacho / Logística</td><td>Computador</td><td>Fila de reabastecimento por depósito, camiões, entregas confirmadas</td><td>Tempo real</td></tr>
+    <tr><td>Gestor regional</td><td>App móvel</td><td>Postos da sua região, estado e histórico</td><td>Push + SMS críticos</td></tr>
+    <tr><td>Gerente de posto</td><td>App / SMS</td><td>Só o seu posto: níveis, próxima entrega</td><td>SMS de nível baixo</td></tr>
+  </table>
+</section>
+
+<!-- ================= 08 SEGURANÇA ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">08</div><h2>Segurança, fiabilidade e conformidade</h2></div>
+
+  <h3>Segurança física (atmosferas explosivas)</h3>
+  <ul>
+    <li>O gateway e a UPS ficam <b>fora das zonas classificadas</b>, no escritório.</li>
+    <li>Nos postos que já têm ATG, <b>não se instala nada no tanque</b> — só se liga um cabo de dados à consola.</li>
+    <li>Qualquer sonda nova é certificada <b>ATEX/IECEx</b> para Zona 0, ligada por barreira de segurança intrínseca e instalada por técnico credenciado, com o posto em procedimento de segurança da Sonangol.</li>
+  </ul>
+
+  <h3>Cibersegurança</h3>
+  <table>
+    <tr><th style="width:30%">Risco</th><th>Medida</th></tr>
+    <tr><td>Alguém altera bombas ou preços pelo sistema</td><td>Impossível por desenho: o gateway só lê a consola ATG e não está ligado às bombas nem ao POS.</td></tr>
+    <tr><td>Interceção dos dados</td><td>TLS 1.2+ ponta a ponta; APN privada opcional (gateways invisíveis na Internet pública).</td></tr>
+    <tr><td>Gateway falso a enviar dados</td><td>Certificado digital único por equipamento; a plataforma rejeita equipamentos não registados.</td></tr>
+    <tr><td>Acesso indevido ao painel</td><td>Contas individuais, perfis por função, autenticação de dois fatores, registo de acessos.</td></tr>
+    <tr><td>Equipamento comprometido</td><td>Firmware assinado, portas locais desativadas, revogação remota do certificado.</td></tr>
+  </table>
+
+  <h3>Fiabilidade em condições angolanas</h3>
+  <table>
+    <tr><th style="width:30%">Situação</th><th>Comportamento do sistema</th></tr>
+    <tr><td>Corte de energia</td><td>Gateway em UPS/bateria (8–24 h); a consola ATG normalmente já está na UPS do posto. Reinício automático no regresso da energia.</td></tr>
+    <tr><td>Falha da rede móvel</td><td>Troca automática para o segundo operador; se ambos falharem, as leituras ficam guardadas (≥ 30 dias) e são enviadas depois, sem lacunas no histórico.</td></tr>
+    <tr><td>Sinal fraco (zonas periféricas)</td><td>Antena externa direcional; em último caso, ligação por satélite.</td></tr>
+    <tr><td>Posto deixa de reportar</td><td>A plataforma deteta o silêncio em 30 min e alerta a equipa técnica.</td></tr>
+    <tr><td>Calor e poeira</td><td>Equipamento de gama industrial, em caixa fechada.</td></tr>
+  </table>
+
+  <h3>Propriedade e soberania dos dados</h3>
+  <p>Os dados pertencem à Sonangol. A plataforma pode ser alojada no datacenter da Sonangol ou numa nuvem à escolha da Sonangol, com cópias de segurança e retenção definidas pela Sonangol. Nenhum dado é partilhado com terceiros. Os dados de tanques não contêm informação pessoal de clientes.</p>
+</section>
+
+<!-- ================= 09 PILOTO ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">09</div><h2>Piloto de 90 dias — plano, levantamento e custos estimados</h2></div>
+  <p>O piloto cobre <b>10 a 20 postos em Luanda</b> (ex.: Talatona, Kilamba Kiaxi, Viana), escolhidos para incluir postos com ATG e pelo menos um sem ATG — para testar ambos os cenários.</p>
+
+  <figure>
+    <svg viewBox="0 0 680 190" xmlns="http://www.w3.org/2000/svg">
+      <g font-family="Helvetica, Arial, sans-serif" font-size="8.8" fill="#10201C">
+        <!-- weeks grid: x 170..670, 12 weeks → ~41.7 px -->
+        <g fill="#7C877F" text-anchor="middle" font-size="8">
+          <text x="191" y="18">S1</text><text x="233" y="18">S2</text><text x="275" y="18">S3</text><text x="316" y="18">S4</text><text x="358" y="18">S5</text><text x="400" y="18">S6</text><text x="441" y="18">S7</text><text x="483" y="18">S8</text><text x="525" y="18">S9</text><text x="566" y="18">S10</text><text x="608" y="18">S11</text><text x="650" y="18">S12</text>
+        </g>
+        <g stroke="#E2E5E1"><line x1="170" y1="24" x2="170" y2="176"/><line x1="254" y1="24" x2="254" y2="176"/><line x1="337" y1="24" x2="337" y2="176"/><line x1="420" y1="24" x2="420" y2="176"/><line x1="504" y1="24" x2="504" y2="176"/><line x1="587" y1="24" x2="587" y2="176"/><line x1="670" y1="24" x2="670" y2="176"/></g>
+        <text x="10" y="42">Levantamento dos postos</text><rect x="172" y="32" width="80" height="14" rx="3" fill="#1D2B4F"/>
+        <text x="10" y="64">Compra e preparação</text><rect x="220" y="54" width="96" height="14" rx="3" fill="#5A6788"/>
+        <text x="10" y="86">Instalação nos postos</text><rect x="275" y="76" width="125" height="14" rx="3" fill="#4a3aa7"/>
+        <text x="10" y="108">Painel ao vivo + alertas</text><rect x="316" y="98" width="352" height="14" rx="3" fill="#8D82D6"/>
+        <text x="10" y="130">Modelo de previsão</text><rect x="483" y="120" width="140" height="14" rx="3" fill="#F2B33D"/>
+        <text x="10" y="152">Avaliação e relatório</text><rect x="587" y="142" width="81" height="14" rx="3" fill="#0C8A0C"/>
+        <path d="M400 168 l5 -8 l5 8 z" fill="#C8302F"/><text x="414" y="174" font-size="8" fill="#C8302F">1.ª leitura real no painel</text>
+        <path d="M662 168 l5 -8 l5 8 z" fill="#C8302F"/><text x="658" y="186" font-size="8" fill="#C8302F" text-anchor="end">decisão de expansão</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura 8 — Cronograma do piloto (12 semanas).</b></figcaption>
+  </figure>
+
+  <div class="two">
+    <div>
+      <h3>Lista de verificação por posto</h3>
+      <ul class="small">
+        <li>Existe consola ATG? Marca e modelo?</li>
+        <li>Porta série ou de rede livre na consola?</li>
+        <li>Tabelas de arqueação dos tanques disponíveis?</li>
+        <li>Número de tanques, produto e capacidade de cada um</li>
+        <li>Intensidade do sinal 4G de cada operador no escritório</li>
+        <li>Existe UPS? Frequência dos cortes de energia</li>
+        <li>Internet fixa já instalada no posto?</li>
+        <li>Local para o gateway e passagem da antena</li>
+        <li>Histórico de entregas e vendas (últimos 6–12 meses)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Indicadores de sucesso</h3>
+      <ul class="small">
+        <li>Horas de posto seco, antes vs. durante o piloto</li>
+        <li>Número de ruturas e de entregas de emergência</li>
+        <li>Precisão da previsão de rutura (erro em horas)</li>
+        <li>Percentagem de leituras recebidas a tempo</li>
+        <li>Diferenças detetadas entre faturas e volumes recebidos</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Custos estimados por posto (ordem de grandeza)</h3>
+  <table>
+    <tr><th>Item</th><th>Posto com ATG</th><th>Posto sem ATG</th><th>Notas</th></tr>
+    <tr><td>Gateway 4G industrial + antena</td><td>US$ 150–500</td><td>US$ 150–500</td><td>Uma vez</td></tr>
+    <tr><td>UPS / bateria dedicada</td><td>US$ 50–150</td><td>US$ 50–150</td><td>Se não houver UPS</td></tr>
+    <tr><td>Sonda / sensor certificado + instalação</td><td>—</td><td>centenas a &gt; US$ 2 000 por tanque</td><td>Depende da tecnologia e da certificação</td></tr>
+    <tr><td>Dados móveis (2 SIM M2M)</td><td>poucos US$/mês</td><td>poucos US$/mês</td><td>≈ 5 MB/mês por posto</td></tr>
+  </table>
+  <div class="callout warn"><b>Atenção:</b> estes valores são estimativas de mercado para orientação e <b>não são uma cotação</b>. Os custos reais dependem do levantamento, dos fornecedores locais, de impostos e de logística de importação.</div>
+</section>
+
+<!-- ================= 10 PERGUNTAS + REFS ================= -->
+<section class="page">
+  <div class="section-head"><div class="kicker">10</div><h2>Perguntas para a Sonangol e referências</h2></div>
+  <h3>Para decidir o desenho do piloto, precisamos de saber</h3>
+  <ol>
+    <li>Que marcas e modelos de medidor automático de tanque (ATG) estão instalados nos postos? Estão ligados a algum sistema central hoje?</li>
+    <li>Que proporção da rede tem ATG — e quais os postos sem medição automática?</li>
+    <li>Como é feito hoje o pedido de reabastecimento: pelo gerente do posto, por telefone, por sistema?</li>
+    <li>Que sistemas de logística e frota (ERP) a Sonangol usa, para uma integração futura?</li>
+    <li>Onde deve ser alojada a plataforma: datacenter da Sonangol ou nuvem?</li>
+    <li>Quem, na Sonangol, seria o responsável técnico do piloto (Operações, TI, Logística)?</li>
+    <li>Quais os postos com maior histórico de ruturas, para entrarem no piloto?</li>
+  </ol>
+
+  <div class="callout"><b>Próximo passo proposto:</b> visita técnica a 2–3 postos em Luanda, acompanhada por um técnico da Sonangol, para fotografar as consolas ATG, medir o sinal móvel e confirmar o tipo de ligação disponível. Com isso, o plano e os custos do piloto passam de estimativa a proposta concreta.</div>
+
+  <h3>Referências</h3>
+  <ol class="refs">
+    <li>Gilbarco Veeder-Root — Insite360 (Brasil): https://www.gilbarco.com/br/solucoes/medicao-e-monitoramento/sonda-e-sensores/insite360</li>
+    <li>Gilbarco — Insite360 Advanced Services Suite: https://www.gilbarco.com/eu/our-solutions/insite360-advanced-services-suite</li>
+    <li>Veeder-Root — "Do you have visibility to your network of gas stations?": https://www.veeder.com/us/blog/do-you-have-visibility-your-network-gas-stations</li>
+    <li>Veeder-Root — Automatic Tank Gauge Products: https://www.veeder.com/us/automatic-tank-gauging-products</li>
+    <li>Gilbarco MEA — Fuel Tank Monitoring and Protection Starts in the Tank: https://www.gilbarco.com/mea/blog/fuel-tank-monitoring-and-protection-starts-tank</li>
+    <li>AFTECH — Automatic Tank Gauging (Africa): https://aftech.africa/solutions/automatic-tank-gauging-atg/</li>
+    <li>AdvaIoT — Forecourt Management System Africa: https://advaiot.com/solutions/forecourt-management</li>
+    <li>Veridapt — Remote tank monitoring case study: https://www.veridapt.com/en/news-and-press/case-studies/remote-tank-level-monitoring</li>
+    <li>OTS Group — Affordable Remote Tank Gauges: https://www.otsgroup.co.uk/news/affordable-remote-tank-gauges</li>
+    <li>MSA — Protocol Driver Sheet, Veeder-Root (função 201, In-Tank Inventory Report): https://assetlibrary.msasafety.com/m/4a88238d4d92bcd6/original/Protocol-Driver-Sheet-Veeder-Root.pdf</li>
+    <li>Chipkin — Veeder-Root protocol knowledge base: https://docs.chipkin.com/kb/veeder-root</li>
+    <li>Exstream Energy — Understanding ATG Systems in East Africa (2026): https://www.exstream-energy.com/2026/05/10/understanding-automatic-tank-gauging-atg-systems-in-east-africa/</li>
+  </ol>
+  <p class="small" style="margin-top:14px">Os números de rede da Sonangol (326 postos), preços de combustível e contexto de mercado estão no painel de demonstração Vigia, com as respetivas fontes. Todos os exemplos numéricos deste documento (leituras, mensagens, gráficos, maquetas) são ilustrativos.</p>
+</section>
+
+</body>
+</html>

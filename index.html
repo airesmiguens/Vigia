@@ -108,6 +108,21 @@
     border-bottom: 1px solid var(--border-strong);
     margin-bottom: 28px;
   }
+  .prepared-for {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 18px;
+  }
+  .prepared-for__label {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .prepared-for__logo { height: 34px; width: auto; display: block; }
+
   .masthead__eyebrow {
     font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
     font-size: 11px;
@@ -534,6 +549,13 @@
 
   <header class="masthead">
     <div>
+      <div class="prepared-for">
+        <span class="prepared-for__label" data-i18n="preparedFor"></span>
+        <picture>
+          <source srcset="assets/sonangol_white.png" media="(prefers-color-scheme: dark)">
+          <img class="prepared-for__logo" src="assets/sonangol_dark.png" alt="Sonangol">
+        </picture>
+      </div>
       <p class="masthead__eyebrow" data-i18n="eyebrow"></p>
       <h1 class="masthead__title">VIGIA</h1>
       <p class="masthead__sub" data-i18n="subtitle"></p>
@@ -751,7 +773,8 @@
   // ---------- i18n ----------
   var i18n = {
     pt: {
-      eyebrow: "Preparado para a Sonangol Distribuidora · Versão de demonstração",
+      preparedFor: "Preparado para",
+      eyebrow: "Sonangol Distribuidora · Versão de demonstração",
       subtitle: "Visibilidade em tempo real dos níveis de stock e do risco de rutura nos postos da Sonangol Distribuidora — uma demonstração do que a telemetria dos tanques pode fazer pela maior rede de combustíveis de Angola.",
       section1Title: "A Sonangol Distribuidora em números",
       section1Note: "Fontes · Dados públicos",
@@ -838,7 +861,8 @@
       marketNames: ["Sonangol Distribuidora", "Bandeira Branca (independentes)", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
     },
     en: {
-      eyebrow: "Prepared for Sonangol Distribuidora · Demonstration build",
+      preparedFor: "Prepared for",
+      eyebrow: "Sonangol Distribuidora · Demonstration build",
       subtitle: "Live visibility into stock levels and stockout risk across Sonangol Distribuidora's stations — a demonstration of what tank telemetry can do for Angola's largest fuel network.",
       section1Title: "Sonangol Distribuidora by the numbers",
       section1Note: "Sourced · Public data",
