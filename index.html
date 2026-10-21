@@ -454,6 +454,45 @@
   .action-badge--schedule { background: color-mix(in srgb, var(--warning-dot) 16%, transparent); color: var(--warning); }
   .action-badge--monitor { background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); }
 
+  /* ---------- How it works ---------- */
+  .how-flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .how-step {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .how-step__kicker {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 4px;
+  }
+  .how-step h3 { margin: 0 0 8px; font-size: 0.98rem; }
+  .how-step p { margin: 0; font-size: 0.82rem; color: var(--text-secondary); }
+  .how-step p strong { color: var(--text-primary); }
+  .faq-title { font-size: 0.95rem; margin: 28px 0 12px; }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .faq-item { background: var(--surface); padding: 14px 18px; }
+  .faq-item h4 { margin: 0 0 6px; font-size: 0.86rem; }
+  .faq-item p { margin: 0; font-size: 0.8rem; color: var(--text-secondary); }
+
   /* ---------- Pitch panel ---------- */
   .pitch-panel {
     background: var(--surface);
@@ -621,9 +660,48 @@
     </div>
   </section>
 
+  <section class="block">
+    <div class="section-label">
+      <span class="section-label__num">05</span>
+      <h2 data-i18n="howTitle"></h2>
+      <span class="section-label__note" data-i18n="howNote"></span>
+    </div>
+    <div class="how-flow">
+      <div class="how-step">
+        <div class="how-step__kicker" data-i18n="how1Kicker"></div>
+        <h3 data-i18n="how1Title"></h3>
+        <p data-i18n-html="how1Text"></p>
+      </div>
+      <div class="how-step">
+        <div class="how-step__kicker" data-i18n="how2Kicker"></div>
+        <h3 data-i18n="how2Title"></h3>
+        <p data-i18n-html="how2Text"></p>
+      </div>
+      <div class="how-step">
+        <div class="how-step__kicker" data-i18n="how3Kicker"></div>
+        <h3 data-i18n="how3Title"></h3>
+        <p data-i18n-html="how3Text"></p>
+      </div>
+      <div class="how-step">
+        <div class="how-step__kicker" data-i18n="how4Kicker"></div>
+        <h3 data-i18n="how4Title"></h3>
+        <p data-i18n-html="how4Text"></p>
+      </div>
+    </div>
+    <h3 class="faq-title" data-i18n="faqTitle"></h3>
+    <div class="faq-grid">
+      <div class="faq-item"><h4 data-i18n="faq1Q"></h4><p data-i18n="faq1A"></p></div>
+      <div class="faq-item"><h4 data-i18n="faq2Q"></h4><p data-i18n="faq2A"></p></div>
+      <div class="faq-item"><h4 data-i18n="faq3Q"></h4><p data-i18n="faq3A"></p></div>
+      <div class="faq-item"><h4 data-i18n="faq4Q"></h4><p data-i18n="faq4A"></p></div>
+      <div class="faq-item"><h4 data-i18n="faq5Q"></h4><p data-i18n="faq5A"></p></div>
+      <div class="faq-item"><h4 data-i18n="faq6Q"></h4><p data-i18n="faq6A"></p></div>
+    </div>
+  </section>
+
   <section class="block pitch-panel">
     <div class="section-label" style="margin-bottom:14px;">
-      <span class="section-label__num">05</span>
+      <span class="section-label__num">06</span>
       <h2 data-i18n="section5Title"></h2>
     </div>
     <p id="pitchP1"></p>
@@ -689,7 +767,7 @@
       section3Title: "Rede Sonangol — simulação em tempo real",
       section3Note: "A atualizar",
       simBadge: "SIMULADO",
-      simText: '<strong>Os dados dos postos abaixo são sintéticos</strong> — nenhum dado da Sonangol foi usado. Capacidades, consumos e previsões de rutura são modelados, não medidos. As secções 01–02 são dados públicos, com fontes. Ligado às leituras reais dos tanques da Sonangol, isto torna-se um painel operacional — ver secção 05.',
+      simText: '<strong>Os dados dos postos abaixo são sintéticos</strong> — nenhum dado da Sonangol foi usado. Capacidades, consumos e previsões de rutura são modelados, não medidos. As secções 01–02 são dados públicos, com fontes. Ligado às leituras reais dos tanques da Sonangol, isto torna-se um painel operacional — ver secções 05–06.',
       riskCritical: "Postos críticos agora",
       riskAtRisk: "Postos que esgotam em 24h",
       riskLitres: "Litros de vendas em risco (24h)",
@@ -728,6 +806,33 @@
       pitchLi4: "<strong>Como medimos o sucesso</strong> — horas de posto seco, número de ruturas e entregas de emergência, comparados com o período antes do piloto.",
       pitchLi5: "<strong>O que é preciso da Sonangol</strong> — acesso às leituras dos tanques (ou autorização para instalar sensores) e ao histórico de entregas dos postos do piloto.",
       pitchLi6: "<strong>Os dados são da Sonangol</strong> — ficam sob controlo da Sonangol, alojados onde a Sonangol definir, e não são partilhados com terceiros.",
+      howTitle: "Como funciona: da sonda no tanque ao painel",
+      howNote: "Só leitura · Sem tocar nas bombas",
+      how1Kicker: "1 · No tanque",
+      how1Title: "Sonda de nível",
+      how1Text: "A maioria dos postos modernos já tem um <strong>medidor automático de tanque</strong> (ATG): sondas em cada tanque ligadas a uma consola no escritório (ex.: Veeder-Root, Franklin Fueling, OPW/Fafnir). Medem o nível de combustível, a água no fundo e a temperatura. Vigia aproveita o que já existe.",
+      how2Kicker: "2 · No escritório",
+      how2Title: "Gateway de comunicação",
+      how2Text: "Uma pequena caixa industrial liga-se à porta série (RS-232) ou de rede da consola e pede o inventário a cada 5–15 minutos — <strong>apenas leitura</strong>. Tem bateria para os cortes de energia e guarda as leituras quando a rede falha.",
+      how3Kicker: "3 · Na rede",
+      how3Title: "Envio seguro",
+      how3Text: "Por <strong>rede móvel 4G/3G</strong> com um cartão SIM (Unitel, Africell ou Movicel), ou pela internet que o posto já tem. Ligação cifrada; cada leitura tem poucos KB, por isso o custo de dados é muito baixo.",
+      how4Kicker: "4 · No servidor",
+      how4Title: "Vigia",
+      how4Text: "Num servidor da Sonangol ou na nuvem que a Sonangol escolher. Converte o nível em litros com a tabela de arqueação de cada tanque, calcula consumo e previsão de rutura, alimenta este painel e envia <strong>alertas por SMS/email</strong> aos despachantes.",
+      faqTitle: "Perguntas frequentes",
+      faq1Q: "E se o posto não tiver sonda automática?",
+      faq1A: "O levantamento das semanas 1–2 identifica estes postos. Instala-se uma sonda ou um sensor radar sem contacto no topo do tanque, certificado para atmosferas explosivas (ATEX/IECEx) e montado por técnico credenciado. Entretanto, a leitura manual da vareta pode ser registada numa app.",
+      faq2Q: "E se a rede móvel falhar?",
+      faq2A: "O gateway guarda as leituras e envia-as quando a rede volta, sem perder dados. Uma antena externa resolve sinal fraco; em zonas sem cobertura, usa-se ligação por satélite.",
+      faq3Q: "O sistema pode mexer nas bombas ou nos preços?",
+      faq3A: "Não. O gateway só lê o inventário dos tanques. Não tem acesso às bombas, ao sistema de caixa (POS) nem a pagamentos.",
+      faq4Q: "Quem controla os dados?",
+      faq4A: "A Sonangol. Ligação cifrada, cada gateway com o seu próprio certificado, alojamento onde a Sonangol definir e acesso por perfis (posto, região, sede).",
+      faq5Q: "E os cortes de energia?",
+      faq5A: "O gateway tem bateria própria e continua a medir. Muitas consolas ATG também estão ligadas à UPS do posto.",
+      faq6Q: "Além das ruturas, o que mais se ganha?",
+      faq6A: "Comparando a descida do nível no tanque com as vendas registadas nas bombas, detetam-se fugas e diferenças de stock — e confirma-se que cada entrega descarregou o volume faturado.",
       signoffCred: "Cientista de Dados · Mestrado em Ciência de Dados, Worcester Polytechnic Institute (prev. 2026) · Bolseiro Fulbright 2024–2026 · IEEE HealthCom 2026 (revisto por pares) · Harvard Health System Innovation Lab, Colaborador de Investigação",
       disclaimer: 'O Vigia é um protótipo independente preparado por Aires Miguêns para apresentação à Sonangol Distribuidora. Não é afiliado nem aprovado pela Sonangol, e não foi construído com dados da Sonangol. Os números das secções 01–02 vêm de fontes públicas (ANGOP, S&amp;P Global, imprensa especializada); os dados dos postos nas secções 03–04 são sintéticos e apenas ilustrativos.',
       marketNames: ["Sonangol Distribuidora", "Bandeira Branca (independentes)", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
@@ -749,7 +854,7 @@
       section3Title: "Sonangol network — live simulation",
       section3Note: "Updating",
       simBadge: "SIMULATED",
-      simText: '<strong>Station data below is synthetic</strong> — no Sonangol data was used. Capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 are public, sourced figures. Connected to Sonangol\'s real tank readings, this becomes an operational dashboard — see section 05.',
+      simText: '<strong>Station data below is synthetic</strong> — no Sonangol data was used. Capacities, draw-down rates and stockout timing are modeled, not measured. Sections 01–02 are public, sourced figures. Connected to Sonangol\'s real tank readings, this becomes an operational dashboard — see sections 05–06.',
       riskCritical: "Stations critical now",
       riskAtRisk: "Stations running dry within 24h",
       riskLitres: "Litres of sales at risk (24h)",
@@ -788,6 +893,33 @@
       pitchLi4: "<strong>How we measure success</strong> — hours stations spend dry, number of stockouts and emergency deliveries, compared with the period before the pilot.",
       pitchLi5: "<strong>What's needed from Sonangol</strong> — access to tank readings (or permission to fit sensors) and delivery history for the pilot stations.",
       pitchLi6: "<strong>The data belongs to Sonangol</strong> — it stays under Sonangol's control, hosted wherever Sonangol decides, and is not shared with third parties.",
+      howTitle: "How it works: from the tank probe to the dashboard",
+      howNote: "Read-only · Never touches the pumps",
+      how1Kicker: "1 · In the tank",
+      how1Title: "Level probe",
+      how1Text: "Most modern stations already have an <strong>automatic tank gauge</strong> (ATG): probes in each tank wired to a console in the office (e.g. Veeder-Root, Franklin Fueling, OPW/Fafnir). They measure fuel level, water at the bottom and temperature. Vigia builds on what is already there.",
+      how2Kicker: "2 · In the office",
+      how2Title: "Communication gateway",
+      how2Text: "A small industrial box connects to the console's serial (RS-232) or network port and requests the inventory every 5–15 minutes — <strong>read-only</strong>. It has a battery for power cuts and stores readings when the network drops.",
+      how3Kicker: "3 · Over the network",
+      how3Title: "Secure transmission",
+      how3Text: "Over <strong>4G/3G mobile network</strong> with a SIM card (Unitel, Africell or Movicel), or the station's existing internet. The connection is encrypted; each reading is a few KB, so data cost is very low.",
+      how4Kicker: "4 · On the server",
+      how4Title: "Vigia",
+      how4Text: "On a Sonangol server or a cloud of Sonangol's choice. It converts level to litres using each tank's calibration chart, calculates draw-down and stockout forecasts, feeds this dashboard and sends <strong>SMS/email alerts</strong> to dispatchers.",
+      faqTitle: "Frequently asked questions",
+      faq1Q: "What if a station has no automatic gauge?",
+      faq1A: "The week 1–2 survey identifies these stations. A probe or a non-contact radar sensor is fitted on top of the tank, certified for explosive atmospheres (ATEX/IECEx) and installed by an accredited technician. In the meantime, manual dipstick readings can be logged in an app.",
+      faq2Q: "What if the mobile network fails?",
+      faq2A: "The gateway stores readings and sends them when the network returns, with no data lost. An external antenna fixes weak signal; areas with no coverage use a satellite link.",
+      faq3Q: "Can the system touch the pumps or prices?",
+      faq3A: "No. The gateway only reads tank inventory. It has no access to the pumps, the point-of-sale system or payments.",
+      faq4Q: "Who controls the data?",
+      faq4A: "Sonangol. Encrypted connections, each gateway with its own certificate, hosting wherever Sonangol decides, and role-based access (station, region, head office).",
+      faq5Q: "What about power cuts?",
+      faq5A: "The gateway has its own battery and keeps measuring. Many ATG consoles are also on the station's UPS.",
+      faq6Q: "Beyond stockouts, what else is gained?",
+      faq6A: "Comparing the drop in tank level with sales recorded at the pumps detects leaks and stock discrepancies — and confirms each delivery unloaded the volume invoiced.",
       signoffCred: "Data Scientist · MSc Data Science, Worcester Polytechnic Institute (exp. 2026) · Fulbright Scholar 2024–2026 · IEEE HealthCom 2026 (peer-reviewed) · Harvard Health System Innovation Lab, Research Collaborator",
       disclaimer: 'Vigia is an independent prototype prepared by Aires Miguêns for presentation to Sonangol Distribuidora. It is not affiliated with or endorsed by Sonangol, and was not built using Sonangol data. Figures in sections 01–02 come from public sources (ANGOP, S&amp;P Global, trade press); station data in sections 03–04 is synthetic and illustrative only.',
       marketNames: ["Sonangol Distribuidora", "Bandeira Branca (independents)", "Pumangol", "Sonangalp (Galp)", "Tomsa (TotalEnergies)"]
@@ -1093,6 +1225,9 @@
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       var key = el.getAttribute("data-i18n");
       el.textContent = t(key);
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
+      el.innerHTML = t(el.getAttribute("data-i18n-html"));
     });
     document.getElementById("sourcesLine").innerHTML = t("sourcesLine");
     document.getElementById("simText").innerHTML = t("simText");
